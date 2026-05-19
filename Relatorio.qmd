@@ -1,0 +1,325 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    fig-cap-location: bottom
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        \setlength{\intextsep}{0.5cm}
+
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{Avaliação da Eficiência de Estouro de Diferentes Tipos de Milho de Pipoca}}
+
+\vspace{2.5cm}
+
+{\large Grupo 2}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Relatório para a disciplina Delineamento e Análise de Experimentos.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\onehalfspacing
+
+# Introdução
+
+O milho de pipoca é um produto amplamente consumido, sendo utilizado tanto em ambientes domésticos quanto comerciais. A qualidade desse produto está diretamente relacionada à sua capacidade de expansão durante o aquecimento, ou seja, à proporção da massa de grãos que efetivamente estoura durante o preparo.
+
+No entanto, nem todos os grãos apresentam o mesmo desempenho térmico, sendo comum a presença de grãos não estourados ou queimados ao final do preparo. Essa variação pode estar associada a fatores como a umidade dos grãos, as condições de armazenamento, a qualidade do processamento e as características específicas de cada marca ou tipo de pipoca disponível no mercado.
+
+Nesse contexto, a avaliação da eficiência de estouro torna-se uma forma objetiva de mensurar a qualidade do produto, permitindo comparar diferentes marcas quanto ao seu desempenho.
+
+Assim, o presente experimento tem como objetivo avaliar e comparar a eficiência de estouro de três tipos de milho de pipoca, por meio da proporção de grãos estourados, sob condições controladas de preparo em panela comum.
+
+# Descrição do Experimento
+
+O experimento consiste na avaliação da eficiência de estouro de três tipos de milho de pipoca, considerados como tratamentos. Para isso, serão preparadas porções de 25 g de milho de pipoca, sob condições padronizadas de preparo, incluindo quantidade fixa de óleo, tempo de aquecimento e utilização de panela comum.
+
+Cada tratamento será avaliado com cinco repetições, totalizando 15 unidades experimentais. Cada repetição utilizará um pacote diferente de milho de pipoca, a fim de representar unidades independentes de avaliação.
+
+Ao final de cada preparo, será contabilizado o número de grãos estourados e de grãos não estourados ou queimados, permitindo a avaliação comparativa da eficiência do processo. O custo total da aquisição dos materiais foi de R\$145,35.
+
+# Materiais e Métodos
+
+## Delineamento Experimental
+
+O experimento será conduzido sob um delineamento inteiramente casualizado (DIC), com três tratamentos, correspondentes aos tipos de milho de pipoca, e cinco repetições por tratamento, totalizando 15 unidades experimentais.
+
+O modelo estatístico adotado será:
+
+$$
+Y_{ij} = \mu + \tau_i + \varepsilon_{ij}
+$$
+
+em que $Y_{ij}$ representa a proporção de grãos estourados na $j$-ésima repetição do $i$-ésimo tratamento, $\mu$ é a média geral, $\tau_i$ é o efeito do tratamento e $\varepsilon_{ij}$ é o erro experimental.
+
+As hipóteses estatísticas avaliadas serão:
+
+$$
+H_0: \mu_1 = \mu_2 = \mu_3
+$$
+
+$$
+H_1: \text{pelo menos uma média difere}
+$$
+
+A eficiência de estouro será definida como:
+
+$$
+Y_{ij} = \frac{n_e}{n_t}
+$$
+
+em que $n_e$ corresponde ao número de grãos estourados e $n_t$ ao número total de grãos avaliados na unidade experimental.
+
+## Tratamentos
+
+O experimento considera três tratamentos, definidos pelos diferentes tipos de milho de pipoca avaliados. Todos os tratamentos serão preparados em panela comum, sob as mesmas condições experimentais.
+
+## Unidades Experimentais
+
+Cada unidade experimental será composta por uma porção de 25 g de milho de pipoca, proveniente de um pacote distinto. Assim, serão avaliadas 15 unidades experimentais, resultantes da combinação de três tratamentos com cinco repetições cada.
+
+## Variáveis
+
+**Variável resposta:** proporção de grãos estourados em relação ao total de grãos contabilizados em cada repetição.
+
+**Variáveis auxiliares:**
+
+- Número de grãos estourados
+- Número de grãos não estourados ou queimados
+
+**Variáveis de controle:**
+
+- Quantidade de milho de pipoca: 25 g por repetição
+- Quantidade de óleo: 3 ml
+- Tempo de aquecimento: 4 minutos
+- Intensidade do fogo: médio
+- Tipo de recipiente: panela comum
+- Condições de preparo: padronizadas para todas as repetições
+
+## Critério de Classificação dos Grãos
+
+Após o preparo, os grãos serão classificados em duas categorias: estourados e não
+estourados/queimados. Serão considerados estourados os grãos que apresentarem abertura
+completa ou parcial, desde que seja visualmente identificável o rompimento da estrutura
+externa do grão. Dessa forma, grãos parcialmente estourados serão classificados como
+estourados, conforme critério visual padronizado.
+
+Será inserida uma figura contendo exemplos visuais dos diferentes estágios de estouro, com o objetivo de padronizar a classificação dos grãos durante a coleta dos dados.
+
+anotação colocar depois
+
+## Procedimento Experimental
+
+Inicialmente, serão pesados 25 g de milho de pipoca para cada repetição, utilizando-se um pacote diferente em cada unidade experimental.
+
+Em seguida, serão adicionados simultaneamente 3 ml de óleo e os grãos de milho de pipoca em uma panela comum, mantida em fogo médio por 4 minutos.
+
+Ao final do processo, será realizada a contagem do número total de grãos, do número de grãos estourados e do número de grãos não estourados ou queimados, sendo calculada a proporção de grãos estourados em cada unidade experimental.
+
+## Casualização e Repetição
+
+O experimento será repetido cinco vezes para cada um dos três tratamentos avaliados.
+
+As repetições serão realizadas de forma independente, utilizando pacotes distintos de milho de pipoca em cada unidade experimental.
+
+Entre cada repetição, a panela será lavada, seca e resfriada, respeitando um intervalo de aproximadamente 10 minutos, a fim de garantir condições experimentais semelhantes.
+
+# Plano de Análise
+
+Os dados obtidos serão analisados inicialmente de forma descritiva, por meio do cálculo da média e do desvio padrão da proporção de grãos estourados em cada tratamento. Também poderão ser construídos gráficos comparativos entre tratamentos, a fim de facilitar a visualização das diferenças observadas.
+
+Para a comparação entre os tipos de milho de pipoca, será realizada análise de variância (ANOVA), considerando o delineamento inteiramente casualizado com três tratamentos e cinco repetições. Caso seja detectada diferença significativa entre os tratamentos, será aplicado o teste de Tukey para comparação das médias.
+
+A eficiência de estouro será expressa como:
+
+$$
+Y_{ij} = \frac{n_e}{n_t}
+$$
+
+em que:
+
+- $n_e$: número de grãos estourados;
+- $n_t$: número total de grãos contabilizados.
+
+em que $n_e$ representa o número de grãos estourados e $n_t$ representa o número total
+de grãos contabilizados na unidade experimental.
+
+Também será considerada a proporção de grãos não estourados ou queimados como complemento da análise.
+
+# Tabela de Resultados
+
+
+\begin{table}[H]
+\centering
+\caption{Tabela para preenchimento posterior dos resultados experimentais.}
+\label{tab:resultados-experimentais}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cccccc}
+\toprule
+Tratamento/Marca & Repetição & Quantidade total de grãos & Grãos estourados & Grãos não estourados/queimados & Proporção de grãos estourados \\
+\midrule
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+ &  &  &  &  &  \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
