@@ -183,60 +183,14 @@ Assim, o presente relatório contempla duas etapas experimentais. A primeira cor
 
 # Descrição do Experimento
 
-O experimento consiste na avaliação da eficiência de estouro de três tipos de milho de pipoca, identificados como tratamentos C, P e SP. Os tratamentos correspondem, respectivamente, à pipoca comum da marca Kicaldo, à pipoca premium da marca Yoki e à pipoca super premium da marca Yoki, todas classificadas como pipoca tipo 1.
+O experimento, conduzido sob um delineamento inteiramente casualizado (DIC), consiste na avaliação da eficiência de estouro de três tipos de milho de pipoca, identificados como tratamentos C, P e SP. Os tratamentos correspondem, respectivamente, à pipoca comum da marca Kicaldo, à pipoca premium da marca Yoki e à pipoca super premium da marca Yoki, todas classificadas como pipoca tipo 1.
 
-Em cada etapa experimental, serão preparadas porções de 25 g de milho de pipoca, em panela comum, com a mesma quantidade de óleo e em fogo médio.
+Em cada etapa experimental, serão preparadas porções de 25 g de milho de pipoca, em panela comum, com a mesma quantidade de óleo e em fogo médio. Ao final de cada preparo, serão contabilizados o número de grãos estourados e de grãos não estourados ou queimados. O custo total da aquisição dos materiais foi de R\$145,35.
 
-No experimento balanceado, cada tratamento foi avaliado com cinco repetições, totalizando 15 unidades experimentais. Já no experimento desbalanceado, os tratamentos C e P apresentaram cinco repetições, enquanto o tratamento SP apresentou quatro repetições, caracterizando o desbalanceamento dos dados. Cada repetição utilizou um pacote distinto de milho de pipoca, a fim de representar unidades independentes de avaliação. Ao final de cada preparo, foi contabilizado o número de grãos estourados e de grãos não estourados ou queimados. O custo total da aquisição dos materiais foi de R\$145,35.
-
-A variável resposta principal para as análises será a proporção de grãos não estourados/queimados. Quanto menor a proporção de grãos não estourados, maior será considerada a eficiência de estouro do tratamento.
-
-# Materiais e Métodos
-
-## Delineamento Experimental
-
-O experimento foi conduzido sob um delineamento inteiramente casualizado (DIC), com três tratamentos, correspondentes aos tipos de milho de pipoca C, P e SP. No experimento balanceado, foram consideradas cinco repetições por tratamento, totalizando 15 unidades experimentais. Já no experimento desbalanceado, o tratamento SP apresentou apenas quatro repetições.
-
-O modelo estatístico adotado será:
-
-$$
-Y_{ij} = \mu + \tau_i + \varepsilon_{ij}
-$$
-
-em que $Y_{ij}$ representa a proporção de grãos não estourados/queimados na $j$-ésima repetição do $i$-ésimo tratamento, $\mu$ representa a média geral, $\tau_i$ representa o efeito do $i$-ésimo tratamento e $\varepsilon_{ij}$ representa o erro experimental aleatório.
-
-As hipóteses estatísticas avaliadas serão:
-
-$$
-H_0: \mu_1 = \mu_2 = \mu_3
-$$
-
-$$
-H_1: \text{pelo menos uma média difere}
-$$
-
-A proporção de grãos não estourados/queimados foi definida como:
-
-$$
-Y_{ij} = \frac{n_{ne}}{n_t}
-$$
-
-em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
-
-Como medida complementar, a eficiência de estouro pôde ser calculada por:
-
-$$
-E_{ij} = \frac{n_e}{n_t}
-$$
-em que $n_e$ corresponde ao número de grãos estourados.
-
-## Tratamentos
-
-O experimento considera três tratamentos, definidos pelos diferentes tipos de milho de pipoca avaliados: C, P e SP. Todos os tratamentos serão preparados em panela comum, sob as mesmas condições experimentais.
 
 ## Unidades Experimentais
 
-Cada unidade experimental foi composta por uma porção de 25 g de milho de pipoca, proveniente de um pacote distinto. No experimento balanceado, foram avaliadas 15 unidades experimentais, resultantes da combinação de três tratamentos com cinco repetições cada. Já no experimento desbalanceado, foram avaliadas 14 unidades experimentais, devido à ausência de uma repetição no tratamento SP.
+As Unidades Experimentais são definidas por uma porção de 25 g de milho de pipoca, proveniente de um pacote distinto.
 
 ## Variáveis
 
@@ -264,7 +218,7 @@ Após o preparo, os grãos serão classificados em duas categorias: estourados e
 
 ## Casualização da Ordem Experimental
 
-O experimento foi conduzido em delineamento inteiramente casualizado (DIC), considerando três tratamentos correspondentes aos tipos de milho de pipoca avaliados:
+Considerando os três tratamentos correspondentes aos tipos de milho de pipoca avaliados:
 
 - comum (C);
 - premium (P);
@@ -303,38 +257,70 @@ Ordem de execução & Tratamento \\
 
 ## Procedimento Experimental Geral
 
-Inicialmente, serão pesados 25 g de milho de pipoca para cada repetição, utilizando-se um pacote distinto para cada unidade experimental. Em seguida, serão adicionados simultaneamente 6 mL de óleo e os grãos de milho em uma panela comum. Posteriormente, a panela será ligada e mantida em fogo médio por 4 minutos, que após o fim do tempo, será imediatamente desligado.
+O Procedimento Experimental consiste das seguintes etapas por unidade experimental:
 
-No experimento desbalanceado, uma das repetições foi conduzida com tempo de 4 minutos e 20 segundos, sendo, portanto, descartada da análise. As demais repetições foram realizadas com tempo padronizado de 4 minutos. Já no experimento balanceado, todas as repetições serão conduzidas sob as mesmas condições, com tempo fixo de 4 minutos de preparo.
-
-Ao final do processo, será realizada a contagem do número total de grãos, do número de grãos estourados e do número de grãos não estourados ou queimados, sendo calculada a proporção de grãos estourados em cada unidade experimental. Entre cada repetição, a panela será lavada, seca e resfriada, respeitando um intervalo de 15 minutos, a fim de garantir condições experimentais semelhantes.
-
+- Pesagem de 25 g de milho do pacote selecionado;
+- Medição de 6 mL de óleo;
+- Adição simultânea do milho e do óleo na panela;
+- Acionamento do fogareiro em fogo médio por 4 minutos cronometrados;
+- Contagem de Estourados e Não Estourados;
+- Cálculo da proporção dos grãos estourados;
+- Intervalo de 15 minutos, no qual a panela sera lavada e resfriada até atingir o estado inicial novamente.
 
 # Plano de Análise
 
-Os dados obtidos serão analisados inicialmente de forma descritiva, por meio do cálculo das médias e dos desvios padrão da quantidade ou proporção de grãos não estourados/queimados em cada tratamento. Também poderão ser construídos gráficos comparativos entre tratamentos, como boxplots, a fim de facilitar a visualização das diferenças observadas.
+O modelo estatístico escolhido para as análises foi o Modelo de Tratamentos:
 
-Para a comparação entre os tratamentos C, P e SP, será realizada uma análise de variância (ANOVA) com as seguintes hipóteses:
+$$
+Y_{ij} = \mu + \tau_i + \varepsilon_{ij}
+$$
+
+em que $Y_{ij}$ representa a proporção de grãos não estourados/queimados na $j$-ésima repetição do $i$-ésimo tratamento, $\mu$ representa a média geral, $\tau_i$ representa o efeito do $i$-ésimo tratamento e $\varepsilon_{ij}$ representa o erro experimental aleatório. 
+
+Os pressupostos do modelo são:
+
+- Independência dos erros $\varepsilon_{ij}$
+- Normalidade dos erros $\varepsilon_{ij} \sim N(0,\sigma^2)$
+- Homogeneidade das variâncias $\mathrm{Var}(\varepsilon_{ij}) = \sigma^2$
+
+Os dados obtidos serão analisados inicialmente de forma descritiva, por meio do cálculo das médias e dos desvios padrão da quantidade ou proporção de grãos não estourados/queimados em cada tratamento. Também construídos gráficos comparativos entre tratamentos, como boxplots, a fim de facilitar a visualização das diferenças observadas.
+
+Para a comparação entre os tratamentos C, P e SP, será realizada uma análise de variância (ANOVA), com as seguintes hipóteses
 
 
 $$
-H_0 : \mu_C = \mu_P = \mu_{SP}
+H_0: \mu_1 = \mu_2 = \mu_3
 $$
 
-- as médias das proporções de grãos não estourados são iguais para todos os tratamentos avaliados.
+As médias são iguais.
 
 $$
-H_1 : \text{pelo menos uma média difere das demais}
+H_1:\ \mu_i \neq \mu_j,\quad \text{para algum } i \neq j,\ \text{com } i,j \in \{1,2,3\}
 $$
 
-- existe diferença significativa entre pelo menos um dos tratamentos.
+Pelo menos uma média é diferente das outras
 
-Ademais, serão verificados os pressupostos do modelo, incluindo a normalidade dos resíduos e a homogeneidade das variâncias. A normalidade será avaliada por meio do teste de Shapiro-Wilk e da inspeção de gráficos QQ-plot, enquanto a homogeneidade de variâncias será verificada pelos testes de Bartlett e de Levene. Quando necessário, será aplicada a transformação de Box-Cox para adequação dos pressupostos. Na presença de diferença significativa entre os tratamentos, será realizado o teste de Tukey para comparações múltiplas entre médias.
+A proporção de grãos não estourados/queimados foi definida como:
 
+$$
+Y_{ij} = \frac{n_{ne}}{n_t}
+$$
 
-# Experimento Desbalanceado
+em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
 
-O experimento desbalanceado corresponde à etapa inicial da avaliação experimental. Nessa etapa, foram realizadas cinco repetições para os tratamentos C e P, e quatro repetições para o tratamento SP, caracterizando um conjunto de dados desbalanceado. 
+Como medida complementar, a eficiência de estouro pôde ser calculada por:
+
+$$
+E_{ij} = \frac{n_e}{n_t}
+$$
+
+em que $n_e$ corresponde ao número de grãos estourados.
+
+Ademais, serão verificados os pressupostos do modelo, incluindo a normalidade dos resíduos e a homogeneidade das variâncias. A normalidade será avaliada por meio do teste de Shapiro-Wilk e da inspeção de gráficos QQ-plot, enquanto a homogeneidade de variâncias será verificada pelos testes de Bartlett e de Levene. Também será aplicada a transformação de Box-Cox para adequação aos pressupostos do modelo caso necessário. Por fim, na presença de diferença significativa entre os tratamentos, será realizado o teste de Tukey para comparações múltiplas entre médias.
+
+# Experimento desbalanceado
+
+O Experimento Desbalanceado corresponde à etapa inicial da avaliação experimental. Nessa etapa, foram realizadas cinco repetições para os tratamentos C e P, e quatro repetições para o tratamento SP, caracterizando um conjunto de dados desbalanceado.
 
 Apesar dessas limitações, essa etapa será mantida no relatório para fins de comparação metodológica e discussão sobre os impactos da falta de padronização experimental. A análise permitirá avaliar como diferenças operacionais e ausência de balanceamento podem influenciar a variabilidade dos dados, a verificação dos pressupostos estatísticos e a interpretação dos efeitos dos tratamentos.
 
@@ -541,6 +527,7 @@ Após a transformação dos dados, uma nova análise de variância foi ajustada.
 ## ANOVA dos dados transformados
 
 \begin{table}[H]
+
 \centering
 \caption{Resultados da ANOVA com dados transformados para o experimento desbalanceado.}
 \label{tab:anova-desbalanceado}
