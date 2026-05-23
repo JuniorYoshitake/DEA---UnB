@@ -18,6 +18,7 @@ format:
     documentclass: article
     papersize: a4
     fontsize: 12pt
+    fig-cap-location: top
 
     geometry:
       - left=3cm
@@ -26,8 +27,6 @@ format:
       - bottom=2cm
 
     colorlinks: true
-
-    fig-cap-location: bottom
 
     include-in-header:
       text: |
@@ -106,8 +105,14 @@ format:
 
         \setlength{\parindent}{1.25cm}
         \setlength{\parskip}{0.15cm}
-        \setlength{\intextsep}{0.5cm}
-
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
         % ------------------------------------------------
         % Títulos
         % ------------------------------------------------
@@ -309,7 +314,22 @@ Ao final do processo, será realizada a contagem do número total de grãos, do 
 
 Os dados obtidos serão analisados inicialmente de forma descritiva, por meio do cálculo das médias e dos desvios padrão da quantidade ou proporção de grãos não estourados/queimados em cada tratamento. Também poderão ser construídos gráficos comparativos entre tratamentos, como boxplots, a fim de facilitar a visualização das diferenças observadas.
 
-Para a comparação entre os tratamentos C, P e SP, será realizada uma análise de variância (ANOVA). Serão verificados os pressupostos do modelo, incluindo a normalidade dos resíduos e a homogeneidade das variâncias. A normalidade será avaliada por meio do teste de Shapiro-Wilk e da inspeção de gráficos QQ-plot, enquanto a homogeneidade de variâncias será verificada pelos testes de Bartlett e de Levene. Quando necessário, será aplicada a transformação de Box-Cox para adequação dos pressupostos. Na presença de diferença significativa entre os tratamentos, será realizado o teste de Tukey para comparações múltiplas entre médias.
+Para a comparação entre os tratamentos C, P e SP, será realizada uma análise de variância (ANOVA) com as seguintes hipóteses:
+
+
+$$
+H_0 : \mu_C = \mu_P = \mu_{SP}
+$$
+
+- as médias das proporções de grãos não estourados são iguais para todos os tratamentos avaliados.
+
+$$
+H_1 : \text{pelo menos uma média difere das demais}
+$$
+
+- existe diferença significativa entre pelo menos um dos tratamentos.
+
+Ademais, serão verificados os pressupostos do modelo, incluindo a normalidade dos resíduos e a homogeneidade das variâncias. A normalidade será avaliada por meio do teste de Shapiro-Wilk e da inspeção de gráficos QQ-plot, enquanto a homogeneidade de variâncias será verificada pelos testes de Bartlett e de Levene. Quando necessário, será aplicada a transformação de Box-Cox para adequação dos pressupostos. Na presença de diferença significativa entre os tratamentos, será realizado o teste de Tukey para comparações múltiplas entre médias.
 
 
 # Experimento Desbalanceado
@@ -319,6 +339,52 @@ O experimento desbalanceado corresponde à etapa inicial da avaliação experime
 Apesar dessas limitações, essa etapa será mantida no relatório para fins de comparação metodológica e discussão sobre os impactos da falta de padronização experimental. A análise permitirá avaliar como diferenças operacionais e ausência de balanceamento podem influenciar a variabilidade dos dados, a verificação dos pressupostos estatísticos e a interpretação dos efeitos dos tratamentos.
 
 ## Tabela de Dados
+
+```{r}
+#| include: false
+
+library(dplyr) 
+library(car) 
+library(MASS) 
+
+set.seed(17052026)
+
+tratamentos <- rep(c("C", "P", "SP"), each = 5) 
+sample(tratamentos)
+
+dados_desb <- data.frame(
+  Grupo = factor(c("P","SP","P","SP",
+             "P","C","P","P","C",
+             "SP","C","C","C","SP")),
+  Identificador = factor(c(3,2,4,3,
+                    5,5,1,2,4,
+                    1,3,1,2,5)),
+  Dia = factor(c(1,1,1,1,
+          1,1,2,2,2,
+          2,2,2,2,2)),
+  Peso = c(25,25,25,25,
+            25,25,25,25,25,
+            25,25,25,25,25),
+  Qtd_antes = c(127,114,124,104,
+                 122,132,131,126,127,
+                 119,139,131,132,104),
+  Qtd_nao_estourou = c(71,62,57,49,
+                        42,64,92,73,59,
+                        99,69,84,44,10),
+  Peso_nao_estourou = c(9,9,9,9,
+                         6,9,17,11,5,
+                         19,7,16,6,2),
+  Tempo = c("04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00")
+)
+
+dados_desb$propo_nao_estourou <- dados_desb$Qtd_nao_estourou / dados_desb$Qtd_ante
+
+mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
+
+```
+
 
 \begin{table}[H]
 \centering
@@ -377,9 +443,27 @@ SP & 55,0 & 36,75 & 0,486 & 4 \\
 
 ## Boxplot
 
-colocar figura boxplot aqui !!!!!!!!!!!!!
+```{r}
+#| label: fig-boxplot-desb
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-align: center
+#| fig-cap: Gráfico Boxplot do experimento desbalanceado
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
 
-## Análise Estatística
+boxplot(
+  propo_nao_estourou ~ Grupo, data = dados_desb,
+  main = "Proporção de grãos não estourados",
+  xlab = "Grupo", ylab = "Proporção"
+)
+```
+
+O boxplot da proporção de grãos não estourados demonstrou diferenças descritivas entre os grupos avaliados. O grupo P apresentou maior mediana, indicando maior proporção de grãos não estourados, enquanto os grupos C e SP apresentaram medianas semelhantes. O grupo SP destacou-se pela elevada variabilidade dos dados, evidenciando menor homogeneidade entre as amostras, enquanto o grupo C apresentou variabilidade baixa, com 2 outliers visíveis. Esses resultados sugerem diferenças no desempenho dos grupos quanto ao estouro dos grãos, embora seja necessária análise estatística para confirmar a significância dessas diferenças.
+
+## ANOVA
 
 Inicialmente, foi ajustado um modelo de análise de variância (ANOVA) considerando a proporção de grãos não estourados/queimados como variável resposta e os tratamentos como fator de interesse.
 
@@ -397,12 +481,34 @@ Resíduo  & 11 & 0.3956 & 0.03596 &       &       \\
 \end{tabular}
 \end{table}
 
+O teste F da ANOVA resultou em valor igual a 0,087, com $p-valor$ de 0,917. Como o $p-valor$ foi superior ao nível de significância de 5%, não houve evidências estatísticas suficientes para rejeitar a hipótese nula de igualdade entre as médias dos tratamentos. Dessa forma, conclui-se que os diferentes tipos de pipoca não apresentaram diferenças significativas quanto à proporção de grãos não estourados/queimados. O experimento apresentou maior variabilidade residual em comparação à variabilidade entre os grupos, indicando que as diferenças observadas podem ser atribuídas ao acaso ou à variabilidade experimental.
+
 Como os pressupostos do modelo poderiam não estar adequadamente atendidos, foi considerada a aplicação da transformação Box-Cox para adequação dos dados.
 
 
 ## Transformação de Box-Cox
 
-colocar figura gráfico da transformação box-cox aqui !!!!!!!!!!!!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico da transformação de Box-Cox do experimento desbalanceado"
+#| label: fig-boxcox-desb
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+bc_desb <- boxcox(mod_desb_inicial)
+
+```
+
+
+```{r}
+#| include: false
+
+lambda_desb <- bc_desb$x[which.max(bc_desb$y)]
+lambda_desb
+
+```
+
 
 O valor de $\lambda$ que maximizou a função de verossimilhança foi:
 
@@ -415,8 +521,24 @@ Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação nos dados:
 $$
 Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
 $$
+```{r}
+#| include: false
+
+if(abs(lambda_desb) < 0.1){
+  dados_desb$transf <- log(dados_desb$propo_nao_estourou)
+} else {
+  dados_desb$transf <- (dados_desb$propo_nao_estourou^lambda_desb - 1)/lambda_desb
+}
+
+modelo_boxcox <- aov(transf ~ Grupo, data = dados_desb)
+summary(modelo_boxcox)
+
+```
+
 
 Após a transformação dos dados, uma nova análise de variância foi ajustada.
+
+## ANOVA transformado
 
 \begin{table}[H]
 \centering
@@ -432,31 +554,69 @@ Resíduo  & 11 & 0.27024 & 0.024567 &        &       \\
 \end{tabular}
 \end{table}
 
-Os resultados da ANOVA com dados transformados não indicaram diferença significativa entre os tratamentos ao nível de 5\% de significância.
+A ANOVA realizada após a transformação de Box-Cox não identificou diferenças estatisticamente significativas entre os grupos avaliados ($F=0,079$; $p=0,925$), considerando nível de significância de 5% (α=0,05). Como o $p-valor$ foi superior a 0,05, não se rejeita a hipótese nula de igualdade entre as médias dos grupos. O elevado $p-valor$ indica que as médias dos tratamentos são estatisticamente semelhantes, sugerindo ausência de efeito significativo dos grupos sobre a variável analisada. Além disso, o baixo valor da estatística F demonstra que a variabilidade entre os grupos foi pequena em relação à variabilidade residual. Dessa forma, conclui-se que os tratamentos não exerceram influência significativa sobre a variável estudada, mesmo após a adequação dos dados aos pressupostos da ANOVA por meio da transformação Box-Cox.
+
 
 ## Verificação de Pressupostos
 
-pós a transformação dos dados, os pressupostos da análise de variância foram avaliados por meio dos testes de normalidade e homogeneidade de variâncias.
+Após a transformação dos dados, os pressupostos da análise de variância foram avaliados por meio dos testes de normalidade e homogeneidade de variâncias.
 
-O teste de Shapiro-Wilk indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p$-valor = 0,8241).
+```{r}
+#| include: false
 
-O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p$-valor = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p$-valor = 0,2956).
+residuos <- residuals(modelo_boxcox)
+shapiro.test(residuos)
+
+bartlett.test(transf ~ Grupo, data = dados_desb)
+leveneTest(transf ~ Grupo, data = dados_desb)
+
+```
+
+O teste de Shapiro-Wilk indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p-valor$ = 0,8241).
+
+O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p-valor$ = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p-valor$ = 0,2956).
 
 Dessa forma, os pressupostos da ANOVA foram considerados adequadamente atendidos após a transformação Box-Cox.
 
 ## Gráfico QQ-Plot
 
-adicionar gráfico qqplot aqui!!!!!!!!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico QQ-Plot do experimento desbalanceado"
+#| label: fig-qqplot-desb
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+qqnorm(residuos)
+qqline(residuos)
+```
 
-A homogeneidade das variâncias foi avaliada pelos testes de Bartlett e Levene. O teste de Bartlett não indicou evidências de heterogeneidade entre os tratamentos ($K^2 = 3{,}5187$; $p$-valor = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade das variâncias ($F = 1{,}3642$; $p$-valor = 0,2956).
+O gráfico QQ-Plot demonstrou que os dados apresentaram distribuição aproximadamente normal após a transformação Box-Cox. Observou-se alinhamento satisfatório dos pontos na região central da distribuição, indicando adequação parcial ao pressuposto de normalidade. Entretanto, pequenos desvios foram identificados nas extremidades do gráfico, sugerindo leve assimetria ou presença de valores extremos. Apesar dessas discrepâncias, os desvios não se mostraram severos, indicando que o pressuposto de normalidade foi atendido de maneira satisfatória para a realização da ANOVA e demais análises paramétricas.
 
-Dessa forma, os resultados indicaram homogeneidade das variâncias entre os tratamentos.
+## Tukey
 
-## Gráfico de Tukey
+```{r}
+#| include: false
+
+TukeyHSD(modelo_boxcox)
+```
 
 Embora a análise de variância não tenha indicado diferença significativa entre os tratamentos ($p > 0,05$), o teste de Tukey foi realizado de forma complementar para avaliação das comparações múltiplas entre médias.
 
-adicionar gráfico Tukey aqui!!!!!!!!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico de Tukey do experimento desbalanceado"
+#| label: fig-tukeyplot-desb
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+
+plot(TukeyHSD(modelo_boxcox))
+
+```
+
 
 \begin{table}[H]
 \centering
@@ -473,9 +633,11 @@ SP - P & -0.0239 & -0.3079 & 0.2601 & 0.9719 \\
 \end{tabular}
 \end{table}
 
+O gráfico e a tabela do teste de Tukey HSD indica que não houve diferença estatisticamente significativa entre os grupos C, P e SP. Embora as diferenças médias estimadas entre os grupos tenham sido pequenas, todas as comparações apresentaram intervalos de confiança de 95% que incluíram o valor zero. Portanto, não há evidências suficientes para afirmar que algum grupo difere dos demais em relação à variável analisada.
+
 ## Interpretação dos Resultados
 
-Espaço reservado para interpretação dos resultados do experimento desbalanceado, incluindo discussão sobre o efeito do tempo discrepante de 4 minutos e 20 segundos, a variabilidade adicional observada e os impactos sobre os pressupostos do modelo estatístico.
+O experimento desbalanceado não identificou diferenças estatisticamente significativas entre os tipos de pipoca comum (C), premium (P) e super premium (SP) quanto à proporção de grãos não estourados, considerando nível de significância de 5% (α=0,05). A ANOVA inicial e a ANOVA após transformação Box-Cox apresentaram valores de p superiores a 0,05, indicando comportamento estatisticamente semelhante entre os tratamentos. Os pressupostos de normalidade dos resíduos e homogeneidade das variâncias foram atendidos, conforme demonstrado pelos testes de Shapiro-Wilk, Bartlett e Levene. Entretanto, observou-se elevada variabilidade experimental, especialmente no grupo SP, além da ocorrência de tempo discrepante de preparo (4 minutos e 20 segundos), que provavelmente contribuiu para aumento da dispersão dos dados e da variabilidade residual do modelo. O desbalanceamento do delineamento e o reduzido número de repetições também podem ter limitado o poder estatístico da análise. Dessa forma, conclui-se que, nas condições avaliadas, os diferentes tipos de pipoca apresentaram eficiência semelhante quanto ao processo de estouro dos grãos, embora fatores operacionais e variabilidade experimental possam ter influenciado os resultados obtidos.
 
 # Experimento Balanceado
 
@@ -543,26 +705,58 @@ SP & 50,6 & 33,12 & 0,446 & 5 \\
 
 ## Boxplot
 
-colocar gráfico boxplot!!!!!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico Boxplot do experimento balanceado"
+#| label: fig-boxplot-bal
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+
+dados_pipoca <- data.frame(
+  Grupo = factor(c("SP","P","SP","P","SP",
+             "P","C","P","P","C",
+             "SP","C","C","C","SP")),
+  Identificador = factor(c(4,3,2,4,3,
+                    5,5,1,2,4,
+                    1,3,1,2,5)),
+  Dia = factor(c(3,1,1,1,1,
+          1,1,2,2,2,
+          2,2,2,2,2)),
+  Peso = c(25,25,25,25,25,
+            25,25,25,25,25,
+            25,25,25,25,25),
+  Qtd_antes = c(116,127,114,124,104,
+                 122,132,131,126,127,
+                 119,139,131,132,104),
+  Qtd_nao_estourou = c(33,71,62,57,49,
+                        42,64,92,73,59,
+                        99,69,84,44,10),
+  Peso_nao_estourou = c(4,9,9,9,9,
+                         6,9,17,11,5,
+                         19,7,16,6,2),
+  Tempo = c("04:00","04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00")
+)
+
+dados_pipoca$prop_nao_estourou <- dados_pipoca$Qtd_nao_estourou / dados_pipoca$Qtd_antes
+
+medias_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, mean)
+
+desvio_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, sd)
+
+boxplot(
+  prop_nao_estourou ~ Grupo, data = dados_pipoca,
+  main = "Proporção de grãos não estourados",
+  xlab = "Grupo", ylab = "Proporção"
+)
+```
+
+O boxplot da proporção de grãos não estourados demonstrou diferenças descritivas entre os grupos avaliados. O grupo P apresentou maior mediana, indicando maior proporção de grãos não estourados, enquanto os grupos C e SP apresentaram medianas semelhantes. O grupo SP destacou-se pela elevada variabilidade dos dados, evidenciando menor homogeneidade entre as amostras. Esses resultados sugerem diferenças no desempenho dos grupos quanto ao estouro dos grãos, embora seja necessária análise estatística para confirmar a significância dessas diferenças.
 
 ## ANOVA
-
-
-Inicialmente, foi ajustado um modelo de análise de variância considerando a proporção de grãos não estourados/queimados como variável resposta.
-
-As hipóteses avaliadas foram:
-
-$$
-H_0 : \mu_C = \mu_P = \mu_{SP}
-$$
-
-em que as médias das proporções de grãos não estourados são iguais para todos os tratamentos avaliados.
-
-$$
-H_1 : \text{pelo menos uma média difere das demais}
-$$
-
-indicando que existe diferença significativa entre pelo menos um dos tratamentos.
 
 \begin{table}[H]
 \centering
@@ -578,13 +772,34 @@ Resíduo & 12 & 0.4280 & 0.03567 &       &       \\
 \end{tabular}
 \end{table}
 
-Os resultados da ANOVA indicaram ausência de diferença significativa entre os tratamentos avaliados ao nível de 5\% de significância ($p$-valor = 0,787). Dessa forma, não houve evidências suficientes para rejeitar a hipótese nula.
+Os resultados da ANOVA indicaram ausência de diferença significativa entre os tratamentos avaliados ao nível de 5\% de significância ($p-valor$ = 0,787). Dessa forma, não houve evidências suficientes para rejeitar a hipótese nula.
+
+Como os pressupostos do modelo poderiam não estar adequadamente atendidos, foi considerada a aplicação da transformação Box-Cox para adequação dos dados.
 
 ## Transformação Box-Cox
 
-A transformação de Box-Cox foi utilizada com o objetivo de verificar a necessidade de transformação dos dados para adequação às pressuposições da análise de variância. Essa técnica auxilia na estabilização das variâncias e na aproximação da normalidade dos resíduos.
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico da transformação de Box-Cox do experimento desbalanceado"
+#| label: fig-boxcox-bal
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+modelo_inicial <- aov(prop_nao_estourou ~ Grupo, data = dados_pipoca)
 
-colocar grãfico boxcox!!!!!!!!!!
+bc <- boxcox(modelo_inicial)
+
+```
+
+```{r}
+#| include: false
+
+lambda <- bc$x[which.max(bc$y)]
+lambda
+
+```
+
 
 O valor de $\lambda$ que maximizou a função de verossimilhança foi igual a 1,070707.
 
@@ -593,8 +808,23 @@ Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação:
 $$
 Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
 $$
+```{r}
+#| include: false
+
+if(abs(lambda) < 0.1){
+  dados_pipoca$transf <- log(dados_pipoca$prop_nao_estourou)
+} else {
+  dados_pipoca$transf <- (dados_pipoca$prop_nao_estourou^lambda - 1)/lambda
+}
+
+modelo_boxcox <- aov(transf ~ Grupo, data = dados_pipoca)
+summary(modelo_boxcox)
+
+```
 
 Após a transformação dos dados, uma nova análise de variância foi ajustada.
+
+## ANOVA transformado
 
 \begin{table}[H]
 \centering
@@ -610,25 +840,64 @@ Resíduo & 12 & 0.3810 & 0.03175 &       &       \\
 \end{tabular}
 \end{table}
 
-Mesmo após a transformação Box-Cox, não foram observadas diferenças significativas entre os tratamentos ($p$-valor = 0,802).
+Após a transformação, a ANOVA demonstrou ausência de diferenças estatisticamente significativas entre os tipos de pipoca comum (C), premium (P) e super premium (SP) quanto a quantidade/proporção de grãos não estourados $(F=0,224$; $p=0,802$), considerando nível de significância de 5% (α=0,05). O baixo valor da estatística $F$ indicou que a variabilidade entre os grupos foi pequena em relação a variabilidade observada dentro dos próprios tratamentos. Dessa forma, conclui-se que os diferentes tipos de pipoca apresentaram desempenho semelhante quanto à eficiência de estouro dos grãos nas condições experimentais avaliadas.
+
 
 ## Verificação de Pressupostos
 
+```{r}
+#| include: false
+
+residuos <- residuals(modelo_boxcox)
+
+shapiro.test(residuos) #Teste de Shapiro-Wilk
+
+bartlett.test(transf ~ Grupo, data = dados_pipoca)
+
+leveneTest(transf ~ Grupo, data = dados_pipoca)
+
+```
+
+
 Os pressupostos da análise de variância foram avaliados após a transformação dos dados.
 
-O teste de Shapiro-Wilk indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0,97186$; $p$-valor = 0,8845).
+O teste de Shapiro-Wilk indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0,97186$; $p-valor$ = 0,8845).
 
-A homogeneidade das variâncias foi avaliada pelos testes de Bartlett e Levene. O teste de Bartlett não indicou evidências de heterogeneidade entre os tratamentos ($K^2 = 3,5028$; $p$-valor = 0,1735). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade das variâncias ($F = 1,6574$; $p$-valor = 0,2314).
+A homogeneidade das variâncias foi avaliada pelos testes de Bartlett e Levene. O teste de Bartlett não indicou evidências de heterogeneidade entre os tratamentos ($K^2 = 3,5028$; $p-valor$ = 0,1735). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade das variâncias ($F = 1,6574$; $p-valor$ = 0,2314).
 
 Dessa forma, os pressupostos da ANOVA foram considerados adequadamente atendidos após a transformação Box-Cox.
 
 ## Gráfico QQ-plot
 
-colocar gráfico QQPLOT !!!!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico QQ-Plot do experimento balanceado"
+#| label: fig-qqplot-bal
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+
+
+qqnorm(residuos)
+qqline(residuos)
+```
+
+
+O gráfico QQ-plot dos resíduos demonstrou alinhamento aproximado dos pontos à linha de referência, indicando que os resíduos apresentam distribuição aproximadamente normal. Pequenos desvios foram observados nas extremidades da distribuição, sugerindo leve afastamento da normalidade, possivelmente relacionado à presença de valores extremos ou discreta assimetria. Contudo, o padrão geral observado indica que o pressuposto de normalidade dos resíduos foi atendido de maneira satisfatória para a análise realizada
 
 ## Tukey
 
 Embora a ANOVA não tenha indicado diferença significativa entre os tratamentos, o teste de Tukey foi realizado para fins exploratórios.
+
+```{r}
+#| include: false
+#| fig-pos: 'H'
+
+TukeyHSD(modelo_boxcox) # Teste de Tukey
+
+```
+
 
 \begin{table}[H]
 \centering
@@ -636,7 +905,7 @@ Embora a ANOVA não tenha indicado diferença significativa entre os tratamentos
 \label{tab:tukey-balanceado}
 \begin{tabular}{ccccc}
 \toprule
-Comparação & Diferença & Limite inferior & Limite superior & $p$-valor ajustado \\
+Comparação & Diferença & Limite inferior & Limite superior & $p-valor$ ajustado \\
 \midrule
 P -- C  & 0.0430  & -0.2576 & 0.3437 & 0.9233 \\
 SP -- C & -0.0322 & -0.3329 & 0.2685 & 0.9562 \\
@@ -647,11 +916,39 @@ SP -- P & -0.0752 & -0.3759 & 0.2255 & 0.7863 \\
 
 Os resultados do teste de Tukey corroboram a ANOVA, não indicando diferenças significativas entre os tratamentos avaliados.
 
- colocar gráfico do teste de Tukey do experimento balanceado !!!
+```{r}
+#| echo: false
+#| fig-cap: "Gráfico de Tukey do experimento balanceado"
+#| label: fig-tukeyplot-bal
+#| fig-align: "center"
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+
+plot(TukeyHSD(modelo_boxcox))
+
+```
+
+O gráfico e a tabela do teste de Tukey HSD indica que não houve diferença estatisticamente significativa entre os grupos C, P e SP. Embora as diferenças médias estimadas entre os grupos tenham sido pequenas, todas as comparações apresentaram intervalos de confiança de 95% que incluíram o valor zero. Portanto, não há evidências suficientes para afirmar que algum grupo difere dos demais em relação à variável analisada.
 
 ## Coeficiente de Variação
 
 O coeficiente de variação (CV) foi calculado com o objetivo de avaliar a variabilidade experimental em relação à média geral dos dados.
+
+```{r}
+#| include: false
+
+media_geral <- mean(dados_pipoca$prop_nao_estourou); 
+media_geral
+
+qm_residuo <- summary(modelo_boxcox)[[1]][["Mean Sq"]][2]; 
+qm_residuo
+
+cv <- (sqrt(qm_residuo)/media_geral)*100
+cv
+
+```
+
 
 A média geral da proporção de grãos não estourados foi igual a 0,4862, enquanto o quadrado médio do resíduo obtido no modelo transformado foi igual a 0,03175.
 
@@ -659,12 +956,20 @@ O coeficiente de variação calculado foi de 36,65\%.
 
 ## Interpretação dos Resultados
 
-Espaço reservado para interpretação dos resultados do experimento balanceado, considerando as diferenças entre os tratamentos C, P e SP, a eficiência de estouro observada e a adequação dos pressupostos estatísticos.
+O experimento balanceado demonstrou que os tipos de pipoca comum (C), premium (P) e super premium (SP) apresentaram comportamento estatisticamente semelhante quanto à proporção de grãos não estourados, considerando nível de significância de 5% (α=0,05). Embora a pipoca super premium tenha apresentado menor média de grãos não estourados, sugerindo tendência de melhor eficiência de estouro, essa diferença não foi estatisticamente significativa. A ANOVA, tanto antes quanto após a transformação Box-Cox, apresentou valores de p superiores a 0,05, indicando ausência de efeito significativo dos tratamentos. Os pressupostos de normalidade dos resíduos e homogeneidade das variâncias foram atendidos satisfatoriamente, conforme demonstrado pelos testes de Shapiro-Wilk, Bartlett e Levene. Entretanto, o elevado coeficiente de variação (36,65%) evidenciou alta variabilidade experimental entre as repetições, o que provavelmente reduziu o poder da análise estatística em detectar pequenas diferenças entre os tipos de pipoca. Dessa forma, conclui-se que, nas condições experimentais avaliadas, os diferentes tipos de pipoca apresentaram eficiência de estouro semelhante.
 
-## Comparação entre os Experimentos
+# Comparação entre os Experimentos
 
-Será realizada uma comparação qualitativa entre o experimento desbalanceado e o experimento balanceado. Nessa comparação, serão discutidos os efeitos da padronização experimental, especialmente quanto ao controle do tempo de preparo. Também serão avaliadas diferenças na variabilidade dos dados, no comportamento dos resíduos e no atendimento aos pressupostos do modelo estatístico.
+A comparação entre o experimento desbalanceado e o experimento balanceado mostrou que a padronização experimental contribuiu para maior estabilidade e qualidade dos dados. No experimento desbalanceado, o número desigual de repetições e a ocorrência de tempo discrepante de preparo aumentaram a variabilidade experimental e a dispersão dos resultados.
+
+Já no experimento balanceado, o controle uniforme do tempo de preparo e a igualdade no número de repetições proporcionaram maior equilíbrio entre os tratamentos e comportamento mais consistente dos dados. Os resíduos apresentaram distribuição mais estável e melhor alinhamento nos gráficos de normalidade, indicando melhor ajuste do modelo estatístico.
+
+Em ambos os experimentos, os pressupostos da ANOVA foram atendidos, já que os testes de normalidade e homogeneidade das variâncias apresentaram valores de $p-valor$ > 0,05. Entretanto, o experimento balanceado apresentou resultados mais confiáveis devido ao maior controle experimental.
+
+Apesar dessas diferenças metodológicas, os dois experimentos levaram à mesma conclusão: não houve diferenças estatisticamente significativas entre os tipos de pipoca comum (C), premium (P) e super premium (SP) quanto à proporção de grãos não estourados, indicando eficiência de estouro semelhante entre os tratamentos avaliados.
 
 # Conclusão
 
-Espaço reservado para preenchimento posterior das conclusões finais, contemplando os resultados do experimento balanceado, a comparação metodológica com o experimento desbalanceado e a importância da padronização experimental na avaliação da eficiência de estouro dos diferentes tipos de milho de pipoca.
+Conclui-se que os tipos de pipoca comum (C), premium (P) e super premium (SP) apresentaram comportamento estatisticamente semelhante quanto à proporção de grãos não estourados, não sendo observadas diferenças significativas entre os tratamentos nos dois experimentos realizados.
+Embora a pipoca super premium tenha apresentado tendência descritiva de melhor eficiência de estouro, essa diferença não foi estatisticamente comprovada.
+Além disso, o experimento balanceado apresentou resultados mais estáveis e consistentes, demonstrando que a padronização experimental, especialmente o controle do tempo de preparo e a igualdade no número de repetições, contribui para maior confiabilidade das análises estatísticas e redução da variabilidade experimental.
