@@ -1,0 +1,344 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{Avaliação da Eficiência de Estouro de Diferentes Tipos de Milho de Pipoca}}
+
+\vspace{2.5cm}
+
+{\large Grupo 2}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Relatório para a disciplina Delineamento e Análise de Experimentos.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\onehalfspacing
+
+# Introdução
+
+Presente em diversas situações como um lanche leve, rico em fibras e de pouca quantidade de calorias, a pipoca é um dos alimentos mais comuns na casa dos cidadões brasileiros. Os produtores do grão de milho, que se tornará a pipoca após o cozimento, atribuem diversas classificações para o seu produto, o que deixa a dúvida para os consumidores: Qual é a diferença entre os tipos de pipoca? O objetivo deste trabalho foi testar diferentes tipos de pipoca, analisando se um tipo é melhor que o outro, por meio da proporção de pipocas não estouradas, em relação ao total.
+
+# Materiais e Métodos
+
+## Casualização
+
+As unidades experimentais, denotadas pela unidade de pacote de pipoca por tipo (C - Comum, P - Premium, SP - Super Premium), foram compradas em comércio local, 5 pacotes por tipo. Seu cozimento teve ordem aleatorizada através de software estatístico.
+
+## Coleta
+
+### Protocolo Experimental
+
+A coleta dos dados foi realizada de maneira padronizada, seguindo o seguinte roteiro:
+
+- Pesagem e medição de 25 g de milho e 6 mL de óleo de cozinha
+
+- Alocação do milho e do óleo em panela comum, simultaneamente
+
+- Acionamento do fogareiro em fogo médio por 4 minutos cronometrados
+
+- Contagem  e cálculo da proporção dos Estourados e Não Estourados
+
+- Intervalo de 15 minutos, no qual a panela é lavada e resfriada até atingir o estado inicial novamente
+
+Foram considerados estourados os grãos que apresentarem abertura completa ou parcial, desde que seja visualmente identificável o rompimento da estrutura do grão.
+
+### Limitações
+
+Neste experimento, devido a limitações externas, uma observação do grupo SP foi perdida, categorizando o experimento como desbalanceado.
+
+```{r}
+#| include: false
+
+library(dplyr) 
+library(car) 
+library(MASS) 
+
+set.seed(17052026)
+
+tratamentos <- rep(c("C", "P", "SP"), each = 5) 
+sample(tratamentos)
+
+dados_desb <- data.frame(
+  Grupo = factor(c("P","SP","P","SP",
+             "P","C","P","P","C",
+             "SP","C","C","C","SP")),
+  Identificador = factor(c(3,2,4,3,
+                    5,5,1,2,4,
+                    1,3,1,2,5)),
+  Dia = factor(c(1,1,1,1,
+          1,1,2,2,2,
+          2,2,2,2,2)),
+  Peso = c(25,25,25,25,
+            25,25,25,25,25,
+            25,25,25,25,25),
+  Qtd_antes = c(127,114,124,104,
+                 122,132,131,126,127,
+                 119,139,131,132,104),
+  Qtd_nao_estourou = c(71,62,57,49,
+                        42,64,92,73,59,
+                        99,69,84,44,10),
+  Peso_nao_estourou = c(9,9,9,9,
+                         6,9,17,11,5,
+                         19,7,16,6,2),
+  Tempo = c("04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00",
+             "04:00","04:00","04:00","04:00","04:00")
+)
+
+dados_desb$propo_nao_estourou <- dados_desb$Qtd_nao_estourou / dados_desb$Qtd_ante
+
+mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
+
+```
+
+### Boxplot
+
+```{r}
+#| label: fig-boxplot-desb
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-align: center
+#| fig-cap: Gráfico Boxplot do experimento desbalanceado
+#| fig-height: 4
+#| fig-width: 6
+#| fig-pos: 'H'
+
+boxplot(
+  propo_nao_estourou ~ Grupo, data = dados_desb,
+  main = "Proporção de grãos não estourados",
+  xlab = "Grupo", ylab = "Proporção"
+)
+```
+
+O boxplot da proporção de grãos não estourados demonstrou diferenças descritivas entre os grupos avaliados. O grupo P apresentou maior mediana, indicando maior proporção de grãos não estourados, enquanto os grupos C e SP apresentaram medianas semelhantes. O grupo SP destacou-se pela elevada variabilidade dos dados, evidenciando menor homogeneidade entre as amostras, enquanto o grupo C apresentou variabilidade baixa, com 2 outliers visíveis.
+
+## Transformação de Box-Cox
+
+Dados provenientes de contagem são naturalmente discretos e frequentemente apresentam assimetria e heterocedasticidade (arrumar ref). Logo, é necessário realizar a transformação de Box-Cox, para permitir a realização de análises estatísticas mais profundas
+
+## Modelo escolhido e Hipóteses
+
+### Modelo
+
+O modelo estatístico escolhido para as análises foi o Modelo de Tratamentos:
+
+$$
+Y_{ij} = \mu + \tau_i + \varepsilon_{ij}
+$$
+
+em que $Y_{ij}$ representa a proporção de grãos não estourados/queimados na $j$-ésima repetição do $i$-ésimo tratamento, $\mu$ representa a média geral, $\tau_i$ representa o efeito do $i$-ésimo tratamento e $\varepsilon_{ij}$ representa o erro experimental aleatório. 
+
+Os pressupostos do modelo são:
+
+- Independência dos erros $\varepsilon_{ij}$
+- Normalidade dos erros $\varepsilon_{ij} \sim N(0,\sigma^2)$
+- Homogeneidade das variâncias $\mathrm{Var}(\varepsilon_{ij}) = \sigma^2$
+
+## Hipóteses de estudo
+
+$$
+H_0: \mu_1 = \mu_2 = \mu_3
+$$
+As médias são iguais.
+
+$$
+H_1:\ \mu_i \neq \mu_j,\quad \text{para algum } i \neq j,\ \text{com } i,j \in \{1,2,3\}
+$$
+Pelo menos uma média é diferente das outras
+
+# Resultados
+
+## Anova
+
+
+\begin{table}[H]
+
+\centering
+\caption{ANOVA com dados transformados para o experimento desbalanceado.}
+\label{tab:anova-desbalanceado}
+\begin{tabular}{cccccc}
+\toprule
+Fonte de variação & Df & SS & MS & F & Pr($>$F) \\
+\midrule
+Grupo    & 2  & 0.00388 & 0.001942 & 0.079 & 0.925 \\
+Resíduo  & 11 & 0.27024 & 0.024567 &        &       \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O $p-valor$ encontrado foi de 0.925, ou seja, a hipótese nula não é rejeitada. Logo, não há evidência estatística suficiente para assumir que os diferentes tipos de pipoca são, de fato, diferentes um dos outros em qualidade.
+
+## Análise das suposições atendidas
+
+Após a transformação dos dados, as suposições da análise de variância foram avaliadas por meio dos testes de normalidade e homogeneidade de variâncias.
+
+O teste de Shapiro-Wilk, sob $H_0: \text{os dados seguem distribuição Normal}$, indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p-valor$ = 0,8241).
+
+Sobre $H_0: \text{as variâncias dos grupos são iguais.}$, O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p-valor$ = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p-valor$ = 0,2956).
+
+Dessa forma, os pressupostos do modelo foram considerados adequadamente atendidos após a transformação Box-Cox.
+
+# Conclusões e Sugestões
+
+As eficiência dos grãos de milho selecionados, por tipo, medida pela proporção de grãos estourados, analisada através de ANOVA, não apresentou evidência significativa de diferença entre tipos. Portanto, para o consumidor, se o objetivo for obter uma maior quantidade de pipocas estouradas, entre a Comum, Premium e Super Premium, não faz diferença qual ele compre, então, pode optar pela mais barata sem perda significativa de eficiência.
+
+Para um estudo mais robusto, mais medidas são necessárias, como o tamanho do grão estourado, gosto, crocância ou dureza, pois limitar as classificações apenas para grão estourado ou não, limita também o que pode ser descoberto.
+
