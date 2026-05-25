@@ -483,7 +483,14 @@ dados_desb <- data.frame(
              "04:00","04:00","04:00","04:00","04:00")
 )
 
-dados_desb$propo_nao_estourou <- dados_desb$Qtd_nao_estourou/dados_desb$Qtd_ante
+dados_desb$propo_nao_estourou <- 
+    dados_desb$Qtd_nao_estourou/dados_desb$Qtd_antes
+
+medias_grupo <- aggregate(propo_nao_estourou ~ Grupo, data = dados_desb, 
+                          mean)
+
+desvio_grupo <- aggregate(propo_nao_estourou ~ Grupo, data = dados_desb, 
+                          sd)
 
 mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
 
@@ -502,7 +509,8 @@ lambda_desb <- bc_desb$x[which.max(bc_desb$y)]
 if(abs(lambda_desb) < 0.1){
   dados_desb$transf <- log(dados_desb$propo_nao_estourou)
 } else {
-  dados_desb$transf <- (dados_desb$propo_nao_estourou^lambda_desb - 1)/lambda_desb
+  dados_desb$transf <- 
+      (dados_desb$propo_nao_estourou^lambda_desb - 1)/lambda_desb
 }
 
 # ANOVA

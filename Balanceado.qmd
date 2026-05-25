@@ -201,10 +201,6 @@ Foram considerados estourados os grãos que apresentarem abertura completa ou pa
 
 Os dados coletados podem ser encontrados no apêndice, na Tabela \ref{tab:dados-desbalanceado}, e suas estatísticas descritivas na Tabela \ref{tab:descritiva-desbalanceado}
 
-### Limitações
-
-Neste experimento, devido a limitações externas, uma observação do grupo SP foi perdida, categorizando o experimento como desbalanceado.
-
 ```{r}
 #| include: false
 
@@ -217,36 +213,38 @@ set.seed(17052026)
 tratamentos <- rep(c("C", "P", "SP"), each = 5) 
 sample(tratamentos)
 
-dados_desb <- data.frame(
-  Grupo = factor(c("P","SP","P","SP",
+dados_pipoca <- data.frame(
+  Grupo = factor(c("SP","P","SP","P","SP",
              "P","C","P","P","C",
              "SP","C","C","C","SP")),
-  Identificador = factor(c(3,2,4,3,
+  Identificador = factor(c(4,3,2,4,3,
                     5,5,1,2,4,
                     1,3,1,2,5)),
-  Dia = factor(c(1,1,1,1,
+  Dia = factor(c(3,1,1,1,1,
           1,1,2,2,2,
           2,2,2,2,2)),
-  Peso = c(25,25,25,25,
+  Peso = c(25,25,25,25,25,
             25,25,25,25,25,
             25,25,25,25,25),
-  Qtd_antes = c(127,114,124,104,
+  Qtd_antes = c(116,127,114,124,104,
                  122,132,131,126,127,
                  119,139,131,132,104),
-  Qtd_nao_estourou = c(71,62,57,49,
+  Qtd_nao_estourou = c(33,71,62,57,49,
                         42,64,92,73,59,
                         99,69,84,44,10),
-  Peso_nao_estourou = c(9,9,9,9,
+  Peso_nao_estourou = c(4,9,9,9,9,
                          6,9,17,11,5,
                          19,7,16,6,2),
-  Tempo = c("04:00","04:00","04:00","04:00",
+  Tempo = c("04:00","04:00","04:00","04:00","04:00",
              "04:00","04:00","04:00","04:00","04:00",
              "04:00","04:00","04:00","04:00","04:00")
 )
 
-dados_desb$propo_nao_estourou <- dados_desb$Qtd_nao_estourou / dados_desb$Qtd_ante
+dados_pipoca$prop_nao_estourou <- dados_pipoca$Qtd_nao_estourou / dados_pipoca$Qtd_antes
 
-mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
+medias_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, mean)
+
+desvio_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, sd)
 
 ```
 
@@ -258,13 +256,13 @@ mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
 #| message: false
 #| warning: false
 #| fig-align: center
-#| fig-cap: Gráfico Boxplot do experimento desbalanceado
+#| fig-cap: Gráfico Boxplot do experimento balanceado
 #| fig-height: 4
 #| fig-width: 6
 #| fig-pos: 'H'
 
 boxplot(
-  propo_nao_estourou ~ Grupo, data = dados_desb,
+  prop_nao_estourou ~ Grupo, data = dados_pipoca,
   main = "Proporção de grãos não estourados",
   xlab = "Grupo", ylab = "Proporção"
 )
@@ -312,29 +310,28 @@ Pelo menos uma média é diferente das outras
 
 
 \begin{table}[H]
-
 \centering
-\caption{ANOVA com dados transformados para o experimento desbalanceado.}
-\label{tab:anova-desbalanceado}
+\caption{Resultados da ANOVA com dados transformados para o experimento balanceado.}
+\label{tab:anova-boxcox-balanceado}
 \begin{tabular}{cccccc}
 \toprule
-Fonte de variação & Df & SS & MS & F & Pr($>$F) \\
+Fonte de variação & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\
 \midrule
-Grupo    & 2  & 0.00388 & 0.001942 & 0.079 & 0.925 \\
-Resíduo  & 11 & 0.27024 & 0.024567 &        &       \\
+Grupo   & 2  & 0.0142 & 0.00712 & 0.224 & 0.802 \\
+Resíduo & 12 & 0.3810 & 0.03175 &       &       \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O $p-valor$ encontrado foi de 0.925, ou seja, a hipótese nula não é rejeitada. Logo, não há evidência estatística suficiente para assumir que os diferentes tipos de pipoca são, de fato, diferentes um dos outros em qualidade.
+O $p-valor$ encontrado foi de 0.802, ou seja, a hipótese nula não é rejeitada. Logo, não há evidência estatística suficiente para assumir que os diferentes tipos de pipoca são, de fato, diferentes um dos outros em qualidade.
 
 ## Análise das suposições atendidas
 
 Após a transformação dos dados, as suposições do modelo foram avaliadas por meio dos testes de normalidade e homogeneidade de variâncias.
 
-O teste de Shapiro-Wilk, sobre $H_0: \text{os dados seguem distribuição Normal}$, indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p-valor$ = 0,8241).
+O teste de Shapiro-Wilk, sobre $H_0: \text{os dados seguem distribuição Normal}$, indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}97186$; $p-valor$ = 0,8845).
 
-Sobre $H_0: \text{as variâncias dos grupos são iguais}$, O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p-valor$ = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p-valor$ = 0,2956).
+Sobre $H_0: \text{as variâncias dos grupos são iguais}$, O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5028$; $p-valor$ = 0,1735). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}6574$; $p-valor$ = 0,2314).
 
 Dessa forma, os pressupostos do modelo foram considerados adequadamente atendidos após a transformação Box-Cox.
 
@@ -390,34 +387,35 @@ Ordem de execução & Tratamento \\
 
 \begin{table}[H]
 \centering
-\caption{Dados do experimento desbalanceado organizados por tratamento.}
-\label{tab:dados-desbalanceado}
+\caption{Dados experimentais do experimento balanceado organizados por tratamento.}
+\label{tab:dados-balanceado}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{cccccccc}
 \toprule
-Grupo & Identificador & Dia & Peso (g) & Qtdd. antes & Grãos estourados & Qtdd. não estourou & Proporção não estourada \\
+Grupo & Identificador & Dia & Peso (g) & Qtdd. antes & Qtdd. não estourou & Grãos estourados & Proporção não estourada \\
 \midrule
 
-C  & 5 & 1 & 25 & 132 & 68 & 64 & 0,485 \\
-C  & 4 & 2 & 25 & 127 & 68 & 59 & 0,465 \\
-C  & 3 & 2 & 25 & 139 & 70 & 69 & 0,496 \\
-C  & 1 & 2 & 25 & 131 & 47 & 84 & 0,641 \\
-C  & 2 & 2 & 25 & 132 & 88 & 44 & 0,333 \\
-
-\midrule
-
-P  & 3 & 1 & 25 & 127 & 56 & 71 & 0,559 \\
-P  & 4 & 1 & 25 & 124 & 67 & 57 & 0,460 \\
-P  & 5 & 1 & 25 & 122 & 80 & 42 & 0,344 \\
-P  & 1 & 2 & 25 & 131 & 39 & 92 & 0,702 \\
-P  & 2 & 2 & 25 & 126 & 53 & 73 & 0,579 \\
+C  & 5 & 1 & 25 & 132 & 64 & 68 & 0,485 \\
+C  & 4 & 2 & 25 & 127 & 59 & 68 & 0,465 \\
+C  & 3 & 2 & 25 & 139 & 69 & 70 & 0,496 \\
+C  & 1 & 2 & 25 & 131 & 84 & 47 & 0,641 \\
+C  & 2 & 2 & 25 & 132 & 44 & 88 & 0,333 \\
 
 \midrule
 
-SP & 2 & 1 & 25 & 114 & 52  & 62 & 0,544 \\
-SP & 3 & 1 & 25 & 104 & 55  & 49 & 0,471 \\
-SP & 1 & 2 & 25 & 119 & 20  & 99 & 0,832 \\
-SP & 5 & 2 & 25 & 104 & 94  & 10 & 0,096 \\
+P  & 3 & 1 & 25 & 127 & 71 & 56 & 0,559 \\
+P  & 4 & 1 & 25 & 124 & 57 & 67 & 0,460 \\
+P  & 5 & 1 & 25 & 122 & 42 & 80 & 0,344 \\
+P  & 1 & 2 & 25 & 131 & 92 & 39 & 0,702 \\
+P  & 2 & 2 & 25 & 126 & 73 & 53 & 0,579 \\
+
+\midrule
+
+SP & 4 & 1 & 25 & 116 & 33 & 83 & 0,284 \\
+SP & 2 & 1 & 25 & 114 & 62 & 52 & 0,544 \\
+SP & 3 & 1 & 25 & 104 & 49 & 55 & 0,471 \\
+SP & 1 & 2 & 25 & 119 & 99 & 20 & 0,832 \\
+SP & 5 & 2 & 25 & 104 & 10 & 94 & 0,096 \\
 
 \bottomrule
 \end{tabular}
@@ -427,16 +425,16 @@ SP & 5 & 2 & 25 & 104 & 94  & 10 & 0,096 \\
 
 \begin{table}[H]
 \centering
-\caption{Médias e desvios padrão da quantidade e da proporção de grãos não estourados/queimados no experimento desbalanceado.}
-\label{tab:descritiva-desbalanceado}
+\caption{Médias e desvios padrão da quantidade e da proporção de grãos não estourados/queimados no experimento balanceado.}
+\label{tab:descritiva-balanceado}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{ccccc}
 \toprule
 Tratamento & Média da quantidade não estourada & Desvio padrão & Média da proporção não estourada & Número de repetições \\
 \midrule
-C  & 64,0 & 14,58 & 0,484 & 5 \\
-P  & 67,0 & 18,72 & 0,529 & 5 \\
-SP & 55,0 & 36,75 & 0,486 & 4 \\
+C & 64,0 & 14,58 & 0,484 & 5 \\
+P & 67,0 & 18,72 & 0,529 & 5 \\
+SP & 50,6 & 33,12 & 0,446 & 5 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
@@ -456,58 +454,66 @@ set.seed(17052026)
 tratamentos <- rep(c("C", "P", "SP"), each = 5) 
 ordem <- sample(tratamentos)
 
-dados_desb <- data.frame(
-  Grupo = factor(c("P","SP","P","SP",
+dados_pipoca <- data.frame(
+  Grupo = factor(c("SP","P","SP","P","SP",
              "P","C","P","P","C",
              "SP","C","C","C","SP")),
-  Identificador = factor(c(3,2,4,3,
+  Identificador = factor(c(4,3,2,4,3,
                     5,5,1,2,4,
                     1,3,1,2,5)),
-  Dia = factor(c(1,1,1,1,
+  Dia = factor(c(3,1,1,1,1,
           1,1,2,2,2,
           2,2,2,2,2)),
-  Peso = c(25,25,25,25,
+  Peso = c(25,25,25,25,25,
             25,25,25,25,25,
             25,25,25,25,25),
-  Qtd_antes = c(127,114,124,104,
+  Qtd_antes = c(116,127,114,124,104,
                  122,132,131,126,127,
                  119,139,131,132,104),
-  Qtd_nao_estourou = c(71,62,57,49,
+  Qtd_nao_estourou = c(33,71,62,57,49,
                         42,64,92,73,59,
                         99,69,84,44,10),
-  Peso_nao_estourou = c(9,9,9,9,
+  Peso_nao_estourou = c(4,9,9,9,9,
                          6,9,17,11,5,
                          19,7,16,6,2),
-  Tempo = c("04:00","04:00","04:00","04:00",
+  Tempo = c("04:00","04:00","04:00","04:00","04:00",
              "04:00","04:00","04:00","04:00","04:00",
              "04:00","04:00","04:00","04:00","04:00")
 )
 
-dados_desb$propo_nao_estourou <- dados_desb$Qtd_nao_estourou/dados_desb$Qtd_ante
+dados_pipoca$prop_nao_estourou <- 
+    dados_pipoca$Qtd_nao_estourou / dados_pipoca$Qtd_antes
 
-mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
+medias_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, 
+                          mean)
 
-#boxplot_desb <- boxplot(
-  #propo_nao_estourou ~ Grupo, data = dados_desb,
+desvio_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, 
+                          sd)
+
+#boxplot(
+  #prop_nao_estourou ~ Grupo, data = dados_pipoca,
   #main = "Proporção de grãos não estourados",
   #xlab = "Grupo", ylab = "Proporção"
 #)
 
+modelo_inicial <- aov(prop_nao_estourou ~ Grupo, data = dados_pipoca)
+
 # transformação de box-cox
 
-bc_desb <- boxcox(mod_desb_inicial, plot = FALSE)
+bc <- boxcox(modelo_inicial, plot = FALSE)
 
-lambda_desb <- bc_desb$x[which.max(bc_desb$y)]
+lambda <- bc$x[which.max(bc$y)]
 
-if(abs(lambda_desb) < 0.1){
-  dados_desb$transf <- log(dados_desb$propo_nao_estourou)
+if(abs(lambda) < 0.1){
+  dados_pipoca$transf <- log(dados_pipoca$prop_nao_estourou)
 } else {
-  dados_desb$transf <- (dados_desb$propo_nao_estourou^lambda_desb - 1)/lambda_desb
+  dados_pipoca$transf <- 
+      (dados_pipoca$prop_nao_estourou^lambda - 1)/lambda
 }
 
 # ANOVA
 
-modelo_boxcox <- aov(transf ~ Grupo, data = dados_desb)
+modelo_boxcox <- aov(transf ~ Grupo, data = dados_pipoca)
 
 # Análise das suposições
 
@@ -516,9 +522,9 @@ residuos <- residuals(modelo_boxcox)
 # Teste de Shapiro
 #shapiro.test(residuos)
 # Teste de Bartlett
-#bartlett.test(transf ~ Grupo, data = dados_desb)
+#bartlett.test(transf ~ Grupo, data = dados_pipoca)
 # Teste de Levene
-#leveneTest(transf ~ Grupo, data = dados_desb)
+#leveneTest(transf ~ Grupo, data = dados_pipoca)
 
 ```
 
