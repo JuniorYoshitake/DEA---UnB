@@ -330,9 +330,9 @@ O $p-valor$ encontrado foi de 0.925, ou seja, a hipótese nula não é rejeitada
 
 Após a transformação dos dados, as suposições da análise de variância foram avaliadas por meio dos testes de normalidade e homogeneidade de variâncias.
 
-O teste de Shapiro-Wilk, sob $H_0: \text{os dados seguem distribuição Normal}$, indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p-valor$ = 0,8241).
+O teste de Shapiro-Wilk, sobre $H_0: \text{os dados seguem distribuição Normal}$, indicou que os resíduos apresentam distribuição aproximadamente normal ($W = 0{,}96633$; $p-valor$ = 0,8241).
 
-Sobre $H_0: \text{as variâncias dos grupos são iguais.}$, O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p-valor$ = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p-valor$ = 0,2956).
+Sobre $H_0: \text{as variâncias dos grupos são iguais}$, O teste de Bartlett não indicou evidências de heterogeneidade de variâncias entre os tratamentos ($K^2 = 3{,}5187$; $p-valor$ = 0,1722). De forma complementar, o teste de Levene também não apresentou evidências de violação da homogeneidade de variâncias ($F = 1{,}3642$; $p-valor$ = 0,2956).
 
 Dessa forma, os pressupostos do modelo foram considerados adequadamente atendidos após a transformação Box-Cox.
 
@@ -342,3 +342,58 @@ As eficiência dos grãos de milho selecionados, por tipo, medida pela proporç�
 
 Para um estudo mais robusto, mais medidas são necessárias, como o tamanho do grão estourado, gosto, crocância ou dureza, pois limitar as classificações apenas para grão estourado ou não, limita também o que pode ser descoberto.
 
+# Apêndice
+
+\begin{table}[H]
+\centering
+\caption{Dados experimentais do experimento desbalanceado organizados por tratamento.}
+\label{tab:dados-desbalanceado}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cccccccc}
+\toprule
+Grupo & Identificador & Dia & Peso (g) & Qtdd. antes & Grãos estourados & Qtdd. não estourou & Proporção não estourada \\
+\midrule
+
+C  & 5 & 1 & 25 & 132 & 68 & 64 & 0,485 \\
+C  & 4 & 2 & 25 & 127 & 68 & 59 & 0,465 \\
+C  & 3 & 2 & 25 & 139 & 70 & 69 & 0,496 \\
+C  & 1 & 2 & 25 & 131 & 47 & 84 & 0,641 \\
+C  & 2 & 2 & 25 & 132 & 88 & 44 & 0,333 \\
+
+\midrule
+
+P  & 3 & 1 & 25 & 127 & 56 & 71 & 0,559 \\
+P  & 4 & 1 & 25 & 124 & 67 & 57 & 0,460 \\
+P  & 5 & 1 & 25 & 122 & 80 & 42 & 0,344 \\
+P  & 1 & 2 & 25 & 131 & 39 & 92 & 0,702 \\
+P  & 2 & 2 & 25 & 126 & 53 & 73 & 0,579 \\
+
+\midrule
+
+SP & 2 & 1 & 25 & 114 & 52  & 62 & 0,544 \\
+SP & 3 & 1 & 25 & 104 & 55  & 49 & 0,471 \\
+SP & 1 & 2 & 25 & 119 & 20  & 99 & 0,832 \\
+SP & 5 & 2 & 25 & 104 & 94  & 10 & 0,096 \\
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Médias e desvios padrão da quantidade e da proporção de grãos não estourados/queimados no experimento desbalanceado.}
+\label{tab:descritiva-desbalanceado}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ccccc}
+\toprule
+Tratamento & Média da quantidade não estourada & Desvio padrão & Média da proporção não estourada & Número de repetições \\
+\midrule
+C  & 64,0 & 14,58 & 0,484 & 5 \\
+P  & 67,0 & 18,72 & 0,529 & 5 \\
+SP & 55,0 & 36,75 & 0,486 & 4 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
