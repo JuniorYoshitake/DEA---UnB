@@ -152,7 +152,7 @@ Departamento de Estatística}
 
 \begin{flushright}
 \begin{minipage}{7.5cm}
-Relatório para a disciplina Delineamento e Análise de Experimentos.
+Relatório para a disciplina Delineamento e Análise de Experimentos (Desbalanceado).
 \end{minipage}
 \end{flushright}
 
@@ -179,13 +179,13 @@ Presente em diversas situações como um lanche leve, rico em fibras e de pouca 
 
 ## Casualização
 
-As unidades experimentais, denotadas pela unidade de pacote de pipoca por tipo (C - Comum, P - Premium, SP - Super Premium), foram compradas em comércio local, 5 pacotes por tipo. Seu cozimento teve ordem aleatorizada através de software estatístico.
+As unidades experimentais, denotadas pela unidade de pacote de pipoca por tipo (C - Comum, P - Premium, SP - Super Premium), foram compradas em comércio local, 5 pacotes por tipo. Seu cozimento teve ordem aleatorizada através de software estatístico, com resultado presente na Tabela \ref{tab:casualizacao} e código no apêndice.
 
 ## Coleta
 
 ### Protocolo Experimental
 
-A coleta dos dados foi realizada de maneira padronizada, seguindo o seguinte roteiro:
+A coleta dos dados foi realizada de maneira padronizada, dado o roteiro:
 
 - Pesagem e medição de 25 g de milho e 6 mL de óleo de cozinha;
 
@@ -196,6 +196,13 @@ A coleta dos dados foi realizada de maneira padronizada, seguindo o seguinte rot
 - Contagem  e cálculo da proporção dos Estourados e Não Estourados;
 
 - Intervalo de 15 minutos, no qual a panela é lavada e resfriada até atingir o estado inicial novamente.
+
+A proporção de não estourados/queimados foi definida como:
+
+$$
+Y_{ij} = \frac{n_{ne}}{n_t}
+$$
+em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
 
 Foram considerados estourados os grãos que apresentarem abertura completa ou parcial, desde que seja visualmente identificável o rompimento da estrutura do grão.
 
@@ -275,6 +282,18 @@ O boxplot da proporção de grãos não estourados demonstrou diferenças descri
 ## Transformação de Box-Cox
 
 Dados de contagem são naturalmente discretos e frequentemente apresentam distribuição assimétrica e variância não constante, características que podem violar os pressupostos de normalidade e homocedasticidade exigidos por modelos estatísticos paramétricos. Assim, a transformação de Box-Cox pode ser empregada com o objetivo de estabilizar a variância e aproximar a distribuição dos resíduos da normalidade, permitindo a realização de análises estatísticas mais adequadas.
+
+O valor de $\lambda$ que maximizou a função de verossimilhança foi:
+
+$$
+\lambda = 1{,}232323
+$$
+
+Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação nos dados:
+
+$$
+Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
+$$
 
 ## Modelo escolhido e Hipóteses
 
@@ -445,7 +464,7 @@ SP & 55,0 & 36,75 & 0,486 & 4 \\
 ## Códigos
 
 ```{r}
-#| echo: true
+#| eval: false
 
 library(dplyr) 
 library(car) 
@@ -454,7 +473,7 @@ library(MASS)
 set.seed(17052026)
 
 tratamentos <- rep(c("C", "P", "SP"), each = 5) 
-ordem <- sample(tratamentos)
+sample(tratamentos)
 
 dados_desb <- data.frame(
   Grupo = factor(c("P","SP","P","SP",
@@ -494,17 +513,18 @@ desvio_grupo <- aggregate(propo_nao_estourou ~ Grupo, data = dados_desb,
 
 mod_desb_inicial <- aov(propo_nao_estourou ~ Grupo, data = dados_desb)
 
-#boxplot_desb <- boxplot(
-  #propo_nao_estourou ~ Grupo, data = dados_desb,
-  #main = "Proporção de grãos não estourados",
-  #xlab = "Grupo", ylab = "Proporção"
-#)
+boxplot_desb <- boxplot(
+  propo_nao_estourou ~ Grupo, data = dados_desb,
+  main = "Proporção de grãos não estourados",
+  xlab = "Grupo", ylab = "Proporção"
+)
 
 # transformação de box-cox
 
-bc_desb <- boxcox(mod_desb_inicial, plot = FALSE)
+bc_desb <- boxcox(mod_desb_inicial)
 
 lambda_desb <- bc_desb$x[which.max(bc_desb$y)]
+lambda_desb
 
 if(abs(lambda_desb) < 0.1){
   dados_desb$transf <- log(dados_desb$propo_nao_estourou)
@@ -522,11 +542,11 @@ modelo_boxcox <- aov(transf ~ Grupo, data = dados_desb)
 residuos <- residuals(modelo_boxcox)
 
 # Teste de Shapiro
-#shapiro.test(residuos)
+shapiro.test(residuos)
 # Teste de Bartlett
-#bartlett.test(transf ~ Grupo, data = dados_desb)
+bartlett.test(transf ~ Grupo, data = dados_desb)
 # Teste de Levene
-#leveneTest(transf ~ Grupo, data = dados_desb)
+leveneTest(transf ~ Grupo, data = dados_desb)
 
 ```
 

@@ -152,7 +152,7 @@ Departamento de Estatística}
 
 \begin{flushright}
 \begin{minipage}{7.5cm}
-Relatório para a disciplina Delineamento e Análise de Experimentos.
+Relatório para a disciplina Delineamento e Análise de Experimentos (Balanceado).
 \end{minipage}
 \end{flushright}
 
@@ -179,13 +179,13 @@ Presente em diversas situações como um lanche leve, rico em fibras e de pouca 
 
 ## Casualização
 
-As unidades experimentais, denotadas pela unidade de pacote de pipoca por tipo (C - Comum, P - Premium, SP - Super Premium), foram compradas em comércio local, 5 pacotes por tipo. Seu cozimento teve ordem aleatorizada através de software estatístico.
+As unidades experimentais, denotadas pela unidade de pacote de pipoca por tipo (C - Comum, P - Premium, SP - Super Premium), foram compradas em comércio local, 5 pacotes por tipo. Seu cozimento teve ordem aleatorizada através de software estatístico, com resultado presente na Tabela \ref{tab:casualizacao} e código no apêndice.
 
 ## Coleta
 
 ### Protocolo Experimental
 
-A coleta dos dados foi realizada de maneira padronizada, seguindo o seguinte roteiro:
+A coleta dos dados foi realizada de maneira padronizada, dado roteiro:
 
 - Pesagem e medição de 25 g de milho e 6 mL de óleo de cozinha;
 
@@ -196,6 +196,13 @@ A coleta dos dados foi realizada de maneira padronizada, seguindo o seguinte rot
 - Contagem  e cálculo da proporção dos Estourados e Não Estourados;
 
 - Intervalo de 15 minutos, no qual a panela é lavada e resfriada até atingir o estado inicial novamente.
+
+A proporção de não estourados/queimados foi definida como:
+
+$$
+Y_{ij} = \frac{n_{ne}}{n_t}
+$$
+em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
 
 Foram considerados estourados os grãos que apresentarem abertura completa ou parcial, desde que seja visualmente identificável o rompimento da estrutura do grão.
 
@@ -274,6 +281,18 @@ O boxplot da proporção de grãos não estourados demonstrou diferenças descri
 
 Dados de contagem são naturalmente discretos e frequentemente apresentam distribuição assimétrica e variância não constante, características que podem violar os pressupostos de normalidade e homocedasticidade exigidos por modelos estatísticos paramétricos. Assim, a transformação de Box-Cox pode ser empregada com o objetivo de estabilizar a variância e aproximar a distribuição dos resíduos da normalidade, permitindo a realização de análises estatísticas mais adequadas.
 
+O valor de $\lambda$ que maximizou a função de verossimilhança foi:
+
+$$
+\lambda = 1{,}070707
+$$
+
+Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação nos dados:
+
+$$
+Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
+$$
+
 ## Modelo escolhido e Hipóteses
 
 ### Modelo de Tratamentos
@@ -340,6 +359,8 @@ Dessa forma, os pressupostos do modelo foram considerados adequadamente atendido
 A eficiência dos grãos de milho selecionados, avaliada pela proporção de grãos estourados em cada tipo e analisada por meio de ANOVA, não apresentou evidências significativas de diferença entre os tratamentos. Dessa forma, para o consumidor cujo objetivo seja obter maior rendimento de pipocas estouradas, a escolha entre os tipos Comum, Premium e Super Premium não implica diferença significativa de eficiência. Assim, a opção pelo produto de menor custo pode ser realizada sem perda relevante de desempenho.
 
 Para um estudo mais robusto, é necessária a inclusão de outras variáveis de avaliação, como tamanho do grão estourado, sabor, crocância e dureza. Limitar a análise apenas à classificação entre grãos estourados e não estourados restringe o alcance das conclusões e reduz o potencial de identificação de diferenças relevantes entre os tratamentos.
+
+Ademais, em comparação com o experimento desbalanceado, não houve alterações substanciais na interpretação dos efeitos dos tratamentos, observando-se apenas um $p-valor$ ligeiramente menor no experimento balanceado.
 
 # Dificuldades
 
@@ -445,14 +466,21 @@ SP & 50,6 & 33,12 & 0,446 & 5 \\
 ```{r}
 #| echo: true
 
-library(dplyr) 
-library(car) 
-library(MASS) 
-
 set.seed(17052026)
 
 tratamentos <- rep(c("C", "P", "SP"), each = 5) 
 ordem <- sample(tratamentos)
+
+```
+
+
+```{r}
+#| eval: false
+
+library(dplyr) 
+library(car) 
+library(MASS) 
+
 
 dados_pipoca <- data.frame(
   Grupo = factor(c("SP","P","SP","P","SP",
@@ -481,27 +509,28 @@ dados_pipoca <- data.frame(
              "04:00","04:00","04:00","04:00","04:00")
 )
 
-dados_pipoca$prop_nao_estourou <- 
-    dados_pipoca$Qtd_nao_estourou / dados_pipoca$Qtd_antes
+dados_pipoca$prop_nao_estourou <- dados_pipoca$Qtd_nao_estourou / dados_pipoca$Qtd_antes
 
-medias_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, 
-                          mean)
+medias_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, mean)
 
-desvio_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, 
-                          sd)
+desvio_grupo <- aggregate(prop_nao_estourou ~ Grupo, data = dados_pipoca, sd)
 
-#boxplot(
-  #prop_nao_estourou ~ Grupo, data = dados_pipoca,
-  #main = "Proporção de grãos não estourados",
-  #xlab = "Grupo", ylab = "Proporção"
-#)
+
+boxplot(
+  prop_nao_estourou ~ Grupo, data = dados_pipoca,
+  main = "Proporção de grãos não estourados",
+  xlab = "Grupo", ylab = "Proporção"
+)
 
 modelo_inicial <- aov(prop_nao_estourou ~ Grupo, data = dados_pipoca)
 
+bc <- boxcox(modelo_inicial)
+
+lambda <- bc$x[which.max(bc$y)]
+lambda
 # transformação de box-cox
 
-bc <- boxcox(modelo_inicial, plot = FALSE)
-
+bc <- boxcox(modelo_inicial)
 lambda <- bc$x[which.max(bc$y)]
 
 if(abs(lambda) < 0.1){
@@ -520,11 +549,11 @@ modelo_boxcox <- aov(transf ~ Grupo, data = dados_pipoca)
 residuos <- residuals(modelo_boxcox)
 
 # Teste de Shapiro
-#shapiro.test(residuos)
+shapiro.test(residuos)
 # Teste de Bartlett
-#bartlett.test(transf ~ Grupo, data = dados_pipoca)
+bartlett.test(transf ~ Grupo, data = dados_pipoca)
 # Teste de Levene
-#leveneTest(transf ~ Grupo, data = dados_pipoca)
+leveneTest(transf ~ Grupo, data = dados_pipoca)
 
 ```
 
