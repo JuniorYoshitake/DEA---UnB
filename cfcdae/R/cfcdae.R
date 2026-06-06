@@ -1,0 +1,13 @@
+#' cfcdae: Companion for a First Course in Design and Analysis of Experiments
+#'
+#' This package provides the data from the text \emph{A First Course in Design and
+#' Analysis of Experiments, 2nd edition} by Gary W. Oehlert. It also includes a
+#'  variety of functions useful in design and analysis that augment functionality
+#' from other standard packages. These include functions for linear contrasts,
+#' pairwise comparisons, interaction plots, classical mixed effects,
+#' analysis of 2-series designs, power/samplesize computation, and others.
+#'
+#' @author Gary W. Oehlert \email{gary@umn.edu}
+#' @docType package
+#' @name cfcdae
+"_PACKAGE"

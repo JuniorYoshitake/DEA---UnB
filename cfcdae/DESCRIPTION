@@ -1,0 +1,22 @@
+Package: cfcdae
+Title: Companion to a First Course in Design and Analysis of
+        Experiments
+Version: 1.4-11
+Authors@R: person("Gary W.","Oehlert",email="gary@umn.edu", role=c("aut", "cre"))
+Description: A collection of functions and data to accompany the book
+	_A First Course in Design and Analysis of Experiments_, second edition,
+	by Gary W. Oehlert. Some functions have analogs in other packages
+	(e.g., interaction plots, pairwise comparisons, AICc) and
+	some appear to be unique (e.g., side by side plots, plot for pairwise
+	comparisons).
+Imports: mvtnorm, pbkrtest, nlme, lme4, stats, DoE.base
+License: GPL (>= 2)
+Date: 2022-11-06
+RoxygenNote: 7.2.1
+Depends: R (>= 3.5.0)
+Encoding: UTF-8
+LazyData: true
+NeedsCompilation: no
+Packaged: 2023-01-09 21:52:46 UTC; gary
+Author: Gary W. Oehlert [aut, cre]
+Maintainer: Gary W. Oehlert <gary@umn.edu>
