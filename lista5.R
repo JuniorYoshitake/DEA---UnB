@@ -8,7 +8,7 @@ library(dplyr)
 library(daewr)
 library(emmeans)
 library(car)
-
+library(multcomp)
 # EX 53 ########################################################################
 
 # EX 54 Oehlert 8.1 ############################################################
@@ -230,8 +230,8 @@ dados <- data.frame(
 mod <- aov(Reacao ~ Solvente * Base, data = dados)
 summary(mod)
 
-# a um nivel de 0.05 de sig, rejeitamos h0 de que não há interacao, há interacao
-# significativa entre fatores
+# a um nivel de 0.05 de sig, rejeitamos h0 de que não há interacao. 
+# Logo, há interacao significativa entre fatores Solvente:Base
 
 model.tables(mod, type = "means")
 
@@ -328,3 +328,127 @@ anova(mod_poly)
 # continuamos sem rejeitar h0 (h0 é nao existe interacao), apenas rejeitamos
 # h0 para a quantidade de solvente, ou seja, a concentracao de solvente altera
 # o percentual de reacao
+
+# EX 61 KUEHL 6.3 Efeito da temp no encolhimento de 4 tipos de tecido ##########
+
+rm(list = ls())
+
+dados <- data.frame(
+    Tela = factor(rep(1:4, each = 8)),
+    Temperatura = factor(rep(c(210, 215, 220, 225), each = 2, times = 4), ordered = TRUE),
+    Resposta = c(
+        1.8, 2.1, 2.0, 2.1, 4.6, 5.0, 7.5, 7.9,
+        2.2, 2.4, 4.2, 4.0, 5.4, 5.6, 9.8, 9.2,
+        2.8, 3.2, 4.4, 4.8, 8.7, 8.4, 13.2, 13.0,
+        3.2, 3.6, 3.3, 3.5, 5.7, 5.8, 10.9, 11.1
+    )
+)
+
+
+# o modelo é Yij = Media geral + efeito fator A + efeitor fator B + efeito 
+# interacao AB + erro experimental aleatorio
+
+# a ANOVA é 
+
+mod_61 <- aov(Resposta ~ Tela * Temperatura, data = dados)
+
+summary(mod_61)
+
+# a nivel de significancia de 0.05, a hipotese nula de que não há interacao 
+# tela:temp é rejeitada. embora a hipotese seja rejeitada para todos as fontes
+# de variacao
+
+summary(mod_61, split = list(Temperatura = list(Linear = 1, Quadratico = 2)))
+
+summary(mod_61, split = list(
+    "Tela:Temperatura" = list(
+        "Linear x Tela" = 1:3, 
+        "Quadrático x Tela" = 4:6
+    )
+))
+
+
+interaction.plot(x.factor = dados$Temperatura, 
+                 trace.factor = dados$Tela, 
+                 response = dados$Resposta,
+                 type = "b", fixed = TRUE, pch = c(1,2,3,4),
+                 col = c("blue", "red", "darkgreen", "black"),
+                 main = "Perfil de Encolhimento: Tecido x Temperatura",
+                 xlab = "Temperatura (°F)", 
+                 ylab = "Encolhimento Médio (%)")
+
+# EX 62 KUEHL 6.5 Efeito de Inseticida e herbicida no cresc e desenv de algodoeiro
+
+rm(list = ls())
+
+dados <- data.frame(
+    Inseticida = factor(rep(c(0, 20, 40, 60, 80), each = 5), ordered = TRUE),
+    Herbicida = factor(rep(c(0, 0.5, 1.0, 1.5, 2.0), each = 1, times = 5), ordered = TRUE),
+    Resposta = c(
+        122.0, 72.50, 52.00, 36.25, 29.25, 
+        82.75, 84.75, 71.50, 80.50, 72.00,
+        65.75, 68.75, 79.50, 65.75, 82.50,
+        68.00, 70.00, 68.75, 77.25, 68.25, 
+        57.50, 60.75, 63.00, 69.25, 73.25
+        
+    )
+)
+
+mod_65 <- aov(Resposta ~ Inseticida * Herbicida, data = dados)
+
+summary(mod_65)
+
+summary(mod_65, split = list(
+    Inseticida = list(Lin = 1, Quad = 2, Cub = 3),
+    Herbicida = list(Lin = 1, Quad = 2, Cub = 3),
+    "Inseticida:Herbicida" = list(
+        "I_Lin x H_Lin" = 1, 
+        "I_Quad x H_Lin" = 5
+    )
+))
+
+
+MSE <- 174 # 75 gl
+
+# nao vou fazer essa merda
+
+# EX 63 Miliken e Johnson 9.1
+
+rm(list = ls())
+
+dados63 <- data.frame(
+    Escore = c(42, 44, 36, 13, 19, 22, 33, 26, 33, 21, 31, -3, 25, 24, # Droga 1 (D1, D2, D3)
+               28, 23, 34, 42, 13, 34, 33, 31, 36, 3, 26, 28, 32, 4, 16, # Droga 2
+               1, 24, 9, 22, -2, 15, 21, 1, 9, 3, 11, 9, 7, 1, -6, # Droga 3
+               1, 29, 19, 22, 7, 25, 5, 12, 27, 12, -5, 16, 15, 12), # Droga 4
+    Droga = factor(c(rep(1, 14), rep(2, 15), rep(3, 15), rep(4, 14))),
+    Doenca = factor(c(rep(1,6), rep(2,4), rep(3,4),  # Droga 1
+                      rep(1,5), rep(2,4), rep(3,6),  # Droga 2
+                      rep(1,6), rep(2,4), rep(3,5),  # Droga 3
+                      rep(1,3), rep(2,5), rep(3,6))) # Droga 4
+)
+
+
+#a)
+
+mod_medias <- lm(Escore ~ 0 + Droga:Doenca, data = dados63)
+summary(mod_medias)
+
+#b)
+
+# a 0.05 rejeita h0 (então há interacao) para os pares:
+
+# Droga 1 Doenca 1
+# Droga 2 Doenca 1
+# Droga 3 Doenca 1
+# Droga 4 Doenca 1
+# Droga 1 Doenca 2
+# Droga 1 Doenca 2
+# Droga 2 Doenca 2
+# Droga 4 Doenca 2
+# Droga 1 Doenca 3
+# Droga 2 Doenca 3
+# Droga 4 Doenca 3
+
+#c)
+
