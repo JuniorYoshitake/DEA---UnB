@@ -294,11 +294,11 @@ mod_ex59 <- aov(Reacao ~ Solvente * Base, data = dados,
 
 Anova(mod_ex59, type = "III")
 
-ls_cells <- emmeans(mod_ex59, ~ Solvente * Base)
-ls_cells
+mod <- lm(Reacao ~ Solvente * Base, data = dados, contrasts = list(Solvente=contr.sum, Base=contr.sum))
+Anova(mod, type = "III")
 
-ls_solvente <- emmeans(mod_ex59, ~ Solvente)
-ls_base <- emmeans(mod_ex59, ~ Base)
+emmeans(mod, ~ Solvente * Base) # Médias das células
+emmeans(mod, ~ Solvente)        # Médias marginais ajustadas
 
 comp_simples <- emmeans(mod_ex59, pairwise ~ Base | Solvente)
 comp_simples$contrasts
