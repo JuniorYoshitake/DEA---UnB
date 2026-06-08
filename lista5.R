@@ -452,3 +452,17 @@ summary(mod_medias)
 
 #c)
 
+
+# EXEMPLO PROF
+
+A <- rep(factor(c(1:2)), each = 8)
+B <- rep(factor(c(1,1,1,2,2,3,3,3,1,1,2,2,2,3,3,3)))
+Y <- c(19,20,21,24,26,22,25,25,25,27,21,24,24,31,32,33)
+
+fnb <- data.frame(A,B,Y)
+
+fnblm1 <- lm(Y ~ 0 + A:B, fnb)
+
+anova(fnblm1)
+
+coef(fnblm1)
