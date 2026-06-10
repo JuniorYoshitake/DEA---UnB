@@ -1,0 +1,800 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{PROVA 2 - Q3 e Q4}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução Exercícios da P2 da disciplina Delineamento e Análise de Experimentos.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# Questão 3
+
+\textbf{Um pesquisador verifica o ganho médio diário de peso em bezerros gerados por quatro touros (A,B,C e D) selecionados aleatoriamente de uma população de touros. Os touros foram acasalados com vacas também selecionadas aleatoriamente. O ganho médio de peso dos bezerros é apresentado na tabela abaixo.}
+
+\vspace{0.5cm}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Ganho médio de peso dos bezerros"
+#| label: tbl-berra
+#| tbl-pos: H
+
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+library(car)
+library(tidyr)
+library(emmeans)
+library(gmodels)
+library(lme4)
+library(EMSaov)
+
+colunas <- rep(factor(c("A", "B", "C", "D")), each=5)
+linhas <- c(1.46, 1.23, 1.12, 1.23, 1.15,
+            1.17, 1.08, 1.20, 1.08, 0.86, 
+            0.98, 1.06, 1.15, 0.83, 0.86,
+            0.95, 1.10, 1.07, 0.89, 1.12)
+
+dados3 <- data.frame(colunas, linhas)
+
+tab <- matrix(dados3$linhas, ncol = 4)
+colnames(tab) <- levels(dados3$colunas)
+
+tab |>
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", rep("c", 4)),
+    format.args = list(big.mark = ".")
+  ) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+```
+
+\vspace{0.5cm}
+
+\textbf{a) Indique o modelo ajustado, suposições e restrições.}
+
+\vspace{0.5cm}
+
+O modelo ajustado é o modelo de efeitos aleatórios de um fator:
+
+
+\begin{equation}
+Y_ij = \mu + A_i + e_ij
+\end{equation}
+
+Onde:
+
+- $Y_ij$ é o ganho médio de peso do j-ésimo bezerro gerado pelo i-ésimo touro;
+
+- $\mu$ é a média geral do ganho de peso da população de bezerros;
+
+- $A_i$ é o efeito aleatório do i-ésimo touro. Assume-se que $A_i$ ~ N(0,$\sigma_a^2$);
+
+- $e_{ij}$ é o erro experimental, que representa a variação entre bezerros do mesmo touro. Assume-se que $e_{ij}$ ~ N(0,$\sigma_e^2$);
+
+- $i$ = 1, 2, 3, 4.
+
+\vspace{0.5cm}
+
+As suposições são:
+
+- Normalidade do efeito $A_i$ e do erro $e_ij$;
+
+- Independência: Os efeitos dos touros e erros devem ser independentes entre si.
+
+- Homocedasticidade: A variância do erro $\sigma_e^2$ deve ser constante em todos os grupos
+
+\vspace{0.5cm}
+
+A restrição é: Não existem restrições de soma sobre os efeitos ($A_i$), pois o modelo é feito de efeitos aleatórios.
+
+\newpage
+
+\textbf{b) Realize um breve estudo sobre o ganho médio de peso dos bezerros.}
+
+\vspace{0.5cm}
+
+Teste sob a hipótese nula de que não há variabilidade entre touros:
+
+$H_o)$ : $\sigma_a^2$ = 0
+$H_a$ : $\sigma_a^2$ > 0 
+
+Por meio da razão F = MSA/MSW, com $\alpha$ = 0.05.
+
+\vspace{0.5cm}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+mod <- aov(linhas ~ colunas, dados3)
+
+summary(mod)
+
+res_anova <- summary(mod)[[1]]
+
+MSA <- summary(mod)[[1]][1,3]
+MSW <- res_anova[2, 3]
+SSW <- res_anova[2, 2]
+F0  <- res_anova[1, 4]
+
+ni <- table(dados3$colunas)
+a  <- length(ni)
+n_total <- sum(ni)
+n <- 1/(a - 1) * (n_total - sum(ni^2)/n_total) 
+
+sig2e_hat <- MSW
+sig2a_hat <- (MSA - MSW) / n
+rho_hat   <- sig2a_hat / (sig2a_hat + sig2e_hat)
+```
+
+\vspace{0.5cm}
+
+Com base no $p-valor$ de 0.0255, rejeitamos $H_0$ a 0.05 de significância. Existe variabilidade estatisticamente significativa entre os touros na população.
+
+Utilizando o Método dos momentos, estimativas pontuais das componentes de variância:
+
+Por meio do ANOVA do teste anterior podemos notar a Variância residual ($\hat{\sigma}_e^2$) = MSW = 0.0159.
+
+Logo, a Variância entre Touros ($\hat{\sigma}_a^2$) = $(MSA-MSW)/n$ = $(0.0645 - 0.0159)/5$ = 0.0097.
+
+E por fim, o Coeficiente de correlação intraclasse ($\rho$)
+
+\begin{equation}
+\hat{\rho}
+=
+\frac{\hat{\sigma}_a^2}
+{\hat{\sigma}_a^2 + \hat{\sigma}_e^2}
+=
+\frac{0.0097}{0.0097 + 0.0159}
+=
+0.3791
+\end{equation}
+
+Cerca de 37.9% da variância total no ganho de peso dos bezerros é atribuída à genética dos touros.
+
+\vspace{0.5cm}
+
+\textbf{c) Inclua intervalos de 90\% de confiança para suas estimativas.}
+
+\vspace{0.5cm}
+
+O intervalo para a Variância do Erro ($\sigma_e^2$) é:
+
+\begin{equation}
+0.0097
+\leq
+\sigma_e^2
+\leq
+0.0320.
+\end{equation}
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+Fv <-  res_anova[1, 4]
+pv <- summary(mod)[[1]][1,5]
+
+alpha <- 0.10
+
+df_e <- n_total - a
+
+A <- qchisq(1-alpha/2,a*(n - 1))
+B <- qchisq(alpha/2,a*(n - 1))
+
+intsig2e <- c(SSW/A,SSW/B)
+  print(paste0("Int. de ", (1-alpha)*100,
+               "% para sig2e: [",
+               round(intsig2e[1],4),
+              ",",round(intsig2e[2],4),"]"))
+```
+
+O intervalo de confiança para variância entre Touros ($\sigma_a^2$), obtido através da aproximação de Satterwaite.
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+sig2e <- MSW
+sig2a <- (MSA - MSW)/ni[1]
+
+v <- sig2a**2 /(MSA**2/(n^2*(a-1)) + MSW**2/(n^2*a*(n-1)))
+#v <- round(v,0)
+  
+C <- qchisq(1-alpha/2,v)
+D <- qchisq(alpha/2,v)
+
+intsig2a <- c(v * sig2a/C,v * sig2a/D)
+  print(paste0("Int. de ", (1-alpha)*100,
+               "% para sig2a: [",
+               round(intsig2a[1],4),
+              ",",round(intsig2a[2],4),"]"))
+```
+
+\begin{equation}
+0.0031
+\leq
+\sigma_a^2
+\leq
+0.3037.
+\end{equation}
+
+O intervalo de confiança do Coeficiente de Correlação intraclasse ($\rho$) é:
+
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+F_u <- qf(1-alpha/2,a-1,a*(n - 1))
+  F_l <- qf(alpha/2,a-1,a*(n - 1))
+
+  rho_ic_i <- (Fv-F_u)/(Fv+(n-1)*F_u)
+  rho_ic_s <- (Fv-F_l)/(Fv+(n-1)*F_l)
+
+  print(paste0("Int. de ", (1-alpha)*100,
+               "% para rho: [", 
+               round(rho_ic_i,4),
+               ",",round(rho_ic_s,4),"]"))
+```
+\begin{equation}
+0.0479
+\leq
+\rho
+\leq
+0.8726.
+\end{equation}
+
+O Intervalo de confiança para a média global ($\mu$) é:
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+se_mu <- sqrt(MSA / (a * n))
+t_crit <- qt(1 - alpha/2, a - 1)
+mean_total <- mean(dados3$linhas)
+ic_mu <- c(mean_total - t_crit * se_mu, mean_total + t_crit * se_mu)
+
+```
+
+\begin{equation}
+0.946
+\leq
+\mu
+\leq
+1.213
+\end{equation}
+
+## Códigos
+
+```{r}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+library(car)
+library(tidyr)
+library(emmeans)
+library(gmodels)
+library(lme4)
+library(EMSaov)
+
+colunas <- rep(factor(c("A", "B", "C", "D")), each=5)
+linhas <- c(1.46, 1.23, 1.12, 1.23, 1.15,
+            1.17, 1.08, 1.20, 1.08, 0.86, 
+            0.98, 1.06, 1.15, 0.83, 0.86,
+            0.95, 1.10, 1.07, 0.89, 1.12)
+
+dados3 <- data.frame(colunas, linhas)
+
+# b)
+
+mod <- aov(linhas ~ colunas, dados3)
+
+summary(mod)
+
+res_anova <- summary(mod)[[1]]
+
+MSA <- summary(mod)[[1]][1,3]
+MSW <- res_anova[2, 3]
+SSW <- res_anova[2, 2]
+F0  <- res_anova[1, 4]
+
+ni <- table(dados3$colunas)
+a  <- length(ni)
+n_total <- sum(ni)
+n <- 1/(a - 1) * (n_total - sum(ni^2)/n_total) 
+
+sig2e_hat <- MSW
+sig2a_hat <- (MSA - MSW) / n
+rho_hat   <- sig2a_hat / (sig2a_hat + sig2e_hat)
+
+# c)
+
+Fv <-  res_anova[1, 4]
+pv <- summary(mod)[[1]][1,5]
+SSW <- res_anova[2, 2]
+
+alpha <- 0.10
+
+df_e <- n_total - a
+
+A <- qchisq(1-alpha/2,a*(n - 1))
+B <- qchisq(alpha/2,a*(n - 1))
+
+intsig2e <- c(SSW/A,SSW/B)
+  print(paste0("Int. de ", (1-alpha)*100,
+               "% para sig2e: [",
+               round(intsig2e[1],4),
+              ",",round(intsig2e[2],4),"]"))
+  
+sig2e <- MSW
+sig2a <- (MSA - MSW)/ni[1]
+
+v <- sig2a**2 /(MSA**2/(n^2*(a-1)) + MSW**2/(n^2*a*(n-1)))
+#v <- round(v,0)
+  
+C <- qchisq(1-alpha/2,v)
+D <- qchisq(alpha/2,v)
+
+intsig2a <- c(v * sig2a/C,v * sig2a/D)
+  print(paste0("Int. de ", (1-alpha)*100,
+               "% para sig2a: [",
+               round(intsig2a[1],4),
+              ",",round(intsig2a[2],4),"]"))
+  
+F_u <- qf(1-alpha/2,a-1,a*(n - 1))
+  F_l <- qf(alpha/2,a-1,a*(n - 1))
+
+rho_ic_i <- (Fv-F_u)/(Fv+(n-1)*F_u)
+rho_ic_s <- (Fv-F_l)/(Fv+(n-1)*F_l)
+
+print(paste0("Int. de ", (1-alpha)*100,
+               "% para rho: [", 
+               round(rho_ic_i,4),
+               ",",round(rho_ic_s,4),"]"))
+
+se_mu <- sqrt(MSA / (a * n))
+t_crit <- qt(1 - alpha/2, a - 1)
+mean_total <- mean(dados3$linhas)
+ic_mu <- c(mean_total - t_crit * se_mu, mean_total + t_crit * se_mu)
+
+```
+
+\newpage
+
+# Questão 4
+
+\textbf{ Um processo químico consiste numa reação com um solvente em uma base em sequência. Um experimento fatorial 3 X 2 com 3 tipos de solvente e duas bases foi realizado com quatro repetições de reações num delineamento completamente casualizado. A resposta representa o percentual de reação.}
+
+\vspace{0.5cm}
+
+```{r results='asis'}
+#| label: tbl-soba
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: Percentual de reação solvente x base
+#| tbl-pos: H
+
+
+dados <- data.frame(
+    Solvente = factor(c(
+        1,1,
+        1,1,1,
+        2,2,2,
+        2,
+        3,3,3,3,
+        3,3,3
+    )),
+    
+    Base = factor(c(
+        1,1,
+        2,2,2,
+        1,1,1,
+        2,
+        1,1,1,1,
+        2,2,2
+    )),
+    
+    Reacao = c(
+        # Solvente 1, Base 1
+        90.7, 91.4, 
+        
+        # Solvente 1, Base 2
+        87.3, 88.3, 91.5,
+        
+        # Solvente 2, Base 1
+        89.3, 88.1, 90.4,
+        
+        # Solvente 2, Base 2
+        94.7,
+        
+        # Solvente 3, Base 1
+        89.5, 87.6, 88.3, 90.3,
+        
+        # Solvente 3, Base 2
+        93.1, 90.7, 91.5
+    )
+)
+
+library(knitr)
+library(kableExtra)
+
+latex_table <- "
+\\begin{table}[h]
+\\centering
+\\begin{tabular}{lcccccc}
+\\toprule
+& \\multicolumn{6}{c}{\\makebox[0pt][l]{\\hspace{-0.65cm}Solvente}} \\\\
+\\cmidrule(r){2-7}
+Base & \\multicolumn{2}{c}{1} & \\multicolumn{2}{c}{2} & \\multicolumn{2}{c}{3} \\\\
+\\midrule
+1 & 90.7 & 91.4 & 89.3 & 88.1 & 89.5 & 87.6 \\\\
+  &      &      & 90.4 &      & 88.3 & 90.3 \\\\
+\\midrule
+2 & 87.3 & 88.3 & 94.7 &      & 93.1 & 90.7 \\\\
+  & 91.5 &      &      &      & 91.5 &      \\\\
+\\bottomrule
+\\end{tabular}
+\\end{table}
+"
+
+cat(latex_table)
+
+```
+
+\textbf{a) Teste a hipótese de não interação entre Base e Solvente. Utilize SS do tipo III.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+Anova(lm(Reacao ~ Base*Solvente, dados,
+         contrasts=list(Base=contr.sum,
+                        Solvente=contr.sum)), type="III")
+
+```
+Para $\alpha = 0.05$, a Hipótese nula de não interação entre Base e Solvente é rejeitada, pois o $p-valor$ do teste da interação é de 0.01085. 
+
+\vspace{0.5cm}
+
+\textbf{b) Calcule as estimativas de mínimos quadrados para o modelo de médias e os respectivos erros-padrão para médias de tratamentos e médias marginais.}
+
+Por meio da função e pacote de mesmo nome \texttt{emmeans}, códigos em anexo, segue os resultados:
+
+```{r}
+#| include: false
+mod <- lm(Reacao ~ Base * Solvente, data = dados, 
+          contrasts = list(Base = contr.sum, Solvente = contr.sum))
+
+emmeans(mod, ~ Base * Solvente) 
+emmeans(mod, ~ Base)        
+emmeans(mod, ~ Solvente)        
+```
+
+- Base: 89.7 (0.489), 91.8 (0.607)
+
+- Solvente: 90.0 (0.643), 92.0 (0.814), 90.3 (0.538)
+
+- Tabela das médias estimadas e erros-padrão para a interação @tbl-media
+
+\vspace{0.25cm}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Médias estimadas e erros-padrão para a interação Base × Solvente"
+#| label: tbl-media
+#| tbl-pos: H
+
+
+tab_medias <- data.frame(
+  Base = c(1, 2, 1, 2, 1, 2),
+  Solvente = c(1, 1, 2, 2, 3, 3),
+  "Média Estimada" = c(91.0, 89.0, 89.3, 94.7, 88.9, 91.8),
+  "Erro Padrão" = c(0.997, 0.814, 0.814, 1.410, 0.705, 0.814)
+)
+
+kable(
+  tab_medias,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  digits = 3
+) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+```
+
+\vspace{0.5cm}
+
+\textbf{c) Estime o contraste entre as duas bases para os níveis 1, 2 e 3 de solvente ($\hat{\mu}_1j. - \hat{\mu}_2j.$ ; j = 1,2,3), e teste a hipótese de igualdade entre as duas médias de cada caso utilizando o nivel de significância de 0.05.}
+
+\vspace{0.5cm}
+
+Utilizando a abordagem do modelo de médias, os contrastes são:
+
+- Solvente 1 = $(1, 0, 0, -1, 0, 0)$
+- Solvente 2 = $(0, 1, 0, 0, -1, 0)$
+- Solvente 3 = $(0, 0, 1, 0, 0, -1)$
+
+Por meio da função \texttt{estimable()} do pacote \texttt{gmodels}, podemos obter a @tbl-contra.
+
+\vspace{0.25cm}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Contrastes para os níveis de solvente"
+#| label: tbl-contra
+#| tbl-pos: H
+
+tab <- data.frame(
+  Solvente = c("1", "2", "3"),
+  Estimate = c(2.016667, -5.433333, -2.841667),
+  Std_Error = c(1.286873, 1.627780, 1.076675),
+  t_value = c(1.567106, -3.337880, -2.639298),
+  DF = c(10, 10, 10),
+  p_value = c(0.14815957, 0.00751732, 0.02476378)
+)
+
+kable(
+  tab,
+  format = "latex",
+  booktabs = TRUE,
+  align = rep("c", ncol(tab)),
+  digits = c(0, 3, 3, 3, 0, 4),
+  col.names = c(
+    "Solvente",
+    "Estimativa",
+    "Erro-padrão",
+    "Valor t",
+    "GL",
+    "Valor-p"
+  )
+) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+
+```
+
+Ademais, para testar a hipótese de igualdade entre as duas médias em cada caso utilizando $\alpha$ = 0.05, é necessário calcular o valor crítico T de Bonferroni, com 10 graus de liberdade e k=3, de 3 comparações.
+
+\begin{equation}
+t_{\frac{0.05}{6},\,10} = 2.87
+\end{equation}
+
+
+Logo, 
+
+- Solvente 1: t = |1.567| < 2.87: Não se rejeita a igualdade;
+- Solvente 2: t = |-3.338| > 2.87: Rejeita-se a igualdade;
+- Solvente 3: t = |-2.639| < 2.87: Não se rejeita a igualdade
+
+Então, a interação significativa entre os fatores é explicada pelo fato de o efeito da base não ser constante, sendo o Solvente 2 o único cenário onde uma base (Base 2) apresenta desempenho superior à outra de forma testada.
+
+\vspace{0.5cm}
+
+\textbf{d) Indique se as estimativas de mínimos quadrados diferem das médias observadas? Explique.}
+
+\vspace{0.5cm}
+
+As estimativas de mínimos quadrados para as médias das células são idênticas às médias observadas se não houver células vazias. A diferença ocorre especificamente nas médias marginais, pois as médias de mínimos quadrados estimam as médias marginais corrigindo o desbalanceamento.
+
+## Códigos
+
+```{r}
+
+# a)
+
+Anova(lm(Reacao ~ Base*Solvente, dados,
+         contrasts=list(Base=contr.sum,
+                        Solvente=contr.sum)), type="III")
+
+#b)
+
+mod <- lm(Reacao ~ Base * Solvente, data = dados, 
+          contrasts = list(Base = contr.sum, Solvente = contr.sum))
+
+emmeans(mod, ~ Base * Solvente) 
+emmeans(mod, ~ Base)        
+emmeans(mod, ~ Solvente) 
+
+#c)
+
+modmedias <- lm(Reacao ~ 0 + Solvente:Base, dados)
+
+csolv1 <- c(1, 0, 0, -1, 0, 0) 
+
+csolv2 <- c(0, 1, 0, 0, -1, 0)
+
+csolv3 <- c(0, 0, 1, 0, 0, -1)
+
+C <- rbind(csolv1,csolv2,csolv3)
+
+estimable(modmedias, C)
+
+```
+
