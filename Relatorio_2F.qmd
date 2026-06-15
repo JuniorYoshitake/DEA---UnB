@@ -1,0 +1,292 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+        \usepackage{amsmath}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{Avaliação da Eficiência de Estouro de Diferentes Tipos de Milho de Pipoca}}
+
+\vspace{2.5cm}
+
+{\large Grupo 2}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Relatório para a disciplina Delineamento e Análise de Experimentos.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# Introdução
+
+A pipoca é um dos alimentos mais populares no Brasil, e o mercado oferece diferentes categorias de milho, como Comum, Premium e Super Premium, que prometem maior rendimento e menor quantidade de grãos não estourados. Entretanto, a qualidade da pipoca produzida depende não apenas das características do grão, mas também das condições de preparo, especialmente do tempo de aquecimento. Nesse contexto, este estudo tem como objetivo avaliar, se as diferentes categorias de milho apresentam comportamentos distintos quando submetidas a diferentes tempos de cozimento. Busca-se, em particular, verificar se os produtos de maior valor agregado mantêm um desempenho superior independentemente do tempo de preparo ou se existe interação entre o tipo de milho e o tempo de exposição ao calor.
+
+# Materiais e Métodos
+
+O experimento segue um Delineamento Inteiramente Casualizado (DIC) com estrutura fatorial $3 \times 3$.
+
+## Modelo escolhido e Hipóteses
+
+O modelo estatístico escolhido para as análises foi o Modelo de Efeito de Tratamentos com Dois Fatores:
+
+$$
+Y_{ijk} = \mu + \alpha_i + \beta_j + \delta_{ij} + e_{ijk}, i = 1, ..., a; j=1, ..., b, k=1,...,n
+$$
+
+Com $e_{ijk}$ ~ $N(0, \sigma^2)$ 
+
+- $\mu$: a média geral.
+
+- $\alpha_i$: efeito fixo do i-ésimo nível do fator Tipo.
+
+- $\beta_j$: efeito fixo do j-ésimo nível do fator Tempo.
+
+- $\delta_{ij}$: o feito da interação do i-ésimo nível do fator Tipo e j-ésimo nível do fator Tempo.
+
+Onde:
+
+- \textbf{Fator Tipo}: é o tipo de pipoca, Comum (C), Premium (P) e Super Premium (SP)
+- \textbf{Fator Tempo}: é o tempo de cozimento, 4:00, 4:15, 4:30
+- \textbf{Unidade Experimental}: pacote individual de milho
+- \textbf{Unidade Observacional}: porção de 25g proveniente do pacote individual de milho
+
+## Hipótese de Estudo
+
+A hipótese de estudo é:
+
+$$
+\left\{
+\begin{array}{l}
+H_0:\ \delta_{ij}=0 \text{ para todo } i,j \\
+H_1:\ \delta_{ij}\neq0 \text{ para algum } i,j
+\end{array}
+\right.
+$$
+
+Ou seja: testar se há interação entre os Fatores Tipo e Tempo.
+
+## Casualização
+
+Serão coletadas 27 observações experimentais independentes, em razão das 9 combinações possíveis e 3 repetições para cada. A ordem da coleta será casualizada, por meio de software estatístico.
+
+## Coleta
+
+A coleta de dados foi realizada de mandeira padronizada, dado o roteiro:
+
+- Pesagem e medição de 25 g de milho do Fator Tipo e 6 mL de óleo de cozinha;
+
+- Alocação do milho e do óleo em panela comum, simultaneamente;
+
+- Acionamento do fogareiro em fogo médio por nível do Fator Tempo;
+
+- Contagem e cálculo da proporção dos Estourados e Não Estourados;
+
+- Intervalo de 15 minutos, no qual a panela é lavada e resfriada até atingir o estado inicial novamente.
+
+A proporção de não estourados/queimados foi definida como:
+
+$$
+Y_{ij} = \frac{n_{ne}}{n_t}
+$$
+
+em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
+
+Foram considerados estourados os grãos que apresentaram abertura completa ou parcial, desde que seja visualmente identficável o rompimento da estrutura do grão.
+Os dados coletados podem ser encontrados no apêndice, na Tabela X, e suas estatísticas descritivas na Tabela X+1
+
+### Limitações
+
+Este estudo caracteriza-se como um experimento sequencial. Para otimização de recursos, foram reaproveitadas observações do experimento anterior (1 fator), selecionando-se aleatoriamente 3 das 5 repetições originais para compor o nível de 4:00 minutos do fator B. As demais 18 unidades experimentais (referentes aos tempos de 4:15 e 4:30) foram integradas ao plano através de uma nova casualização da ordem de execução, garantindo a independência dos erros e a validade das inferências para a estrutura fatorial 3x3.
+
+
+### Boxplot
+
+Inserir boxplot com 9 caixinhas de dados, cada caixinha será uma combinação de tempo x tipo
+
+## Transformação de Box-Cox
+
+Dados de contagem são naturalmente discretos e frequentemente apresentam distribuição assimétrica e variância não constante, características que podem violar os pressupostos de normalidade e homocedasticidade exigidos por modelos estatísticos paramétricos. Assim, a transformação de Box-Cox pode ser empregada com objetivo de estabilizar a variância e aproximar a distribuição dos resíduos da normalidade, permitindo a realização de análises estatísticas mais adequadas.
+
+
+O valor de $\lambda$ que maximizou a função de verossimilhança foi:
+
+$$
+\lambda = fazer
+$$
+
+Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação nos dados:
+
+$$
+Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
+$$
+
+# Resultados
+
+## Gráfico de Interação
+
+## Intervalo de Confiança para Médias
+
+## ANOVA
+
+## Análise das suposições atendidas
+
+# Conclusões e Sugestões
+
+# Dificuldades
+
+
