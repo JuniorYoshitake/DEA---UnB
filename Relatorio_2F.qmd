@@ -222,11 +222,11 @@ Ou seja: testar se há interação entre os Fatores Tipo e Tempo.
 
 ## Casualização
 
-Serão coletadas 27 observações experimentais independentes, em razão das 9 combinações possíveis e 3 repetições para cada. A ordem da coleta será casualizada, por meio de software estatístico.
+Os dados serão colhidos de maneira casualizada, por meio de 15 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. 
 
 ## Coleta
 
-A coleta de dados foi realizada de mandeira padronizada, dado o roteiro:
+A coleta de dados foi realizada de mandeira padronizada,por 3 experimentadores, dado o roteiro:
 
 - Pesagem e medição de 25 g de milho do Fator Tipo e 6 mL de óleo de cozinha;
 
