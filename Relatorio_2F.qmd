@@ -220,13 +220,30 @@ $$
 
 Ou seja: testar se há interação entre os Fatores Tipo e Tempo.
 
+## Limitações, Suposições e Perdas
+
+Este estudo caracteriza-se como um experimento sequencial. Para otimização de recursos, foram reaproveitadas observações provenientes do experimento anterior, originalmente conduzido considerando apenas o fator Tipo. Para compor o nível de 4:00 minutos do fator Tempo, foram selecionadas aleatoriamente três das cinco repetições disponíveis em cada nível do fator Tipo. As dezoito unidades experimentais restantes, correspondentes aos tempos de 4:15 e 4:30, foram incorporadas ao estudo mediante uma nova casualização da ordem de execução.
+
+Por tratar-se de um estudo com finalidade acadêmica e baseado em um modelo simplificado, algumas fontes de variação potencialmente relevantes não foram explicitamente consideradas na modelagem. Dessa forma, as inferências realizadas pressupõem que tais fatores tenham efeito desprezível sobre a variável resposta.
+
+As principais suposições do modelo são:
+
+- independência entre os erros experimentais;
+- normalidade dos erros;
+- homogeneidade das variâncias entre os tratamentos;
+- ausência de efeitos sistemáticos associados aos dias de coleta, aos experimentadores, às condições ambientais e a outras fontes de variação não controladas;
+- inexistência de tendências temporais capazes de influenciar as observações provenientes das diferentes etapas do experimento.
+
+Consequentemente, os resultados obtidos devem ser interpretados dentro do contexto dessas simplificações e das limitações inerentes ao delineamento adotado.
+
+
 ## Casualização
 
 Os dados serão colhidos de maneira casualizada, por meio de 15 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. 
 
 ## Coleta
 
-A coleta de dados foi realizada de mandeira padronizada,por 3 experimentadores, dado o roteiro:
+A coleta de dados foi realizada de mandeira padronizada, por 3 experimentadores, dado o roteiro:
 
 - Pesagem e medição de 25 g de milho do Fator Tipo e 6 mL de óleo de cozinha;
 
@@ -248,11 +265,6 @@ em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e 
 
 Foram considerados estourados os grãos que apresentaram abertura completa ou parcial, desde que seja visualmente identficável o rompimento da estrutura do grão.
 Os dados coletados podem ser encontrados no apêndice, na Tabela X, e suas estatísticas descritivas na Tabela X+1
-
-### Limitações
-
-Este estudo caracteriza-se como um experimento sequencial. Para otimização de recursos, foram reaproveitadas observações do experimento anterior (1 fator), selecionando-se aleatoriamente 3 das 5 repetições originais para compor o nível de 4:00 minutos do fator B. As demais 18 unidades experimentais (referentes aos tempos de 4:15 e 4:30) foram integradas ao plano através de uma nova casualização da ordem de execução, garantindo a independência dos erros e a validade das inferências para a estrutura fatorial 3x3.
-
 
 ### Boxplot
 
