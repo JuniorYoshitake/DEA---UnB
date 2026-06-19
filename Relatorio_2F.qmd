@@ -174,72 +174,71 @@ Relatório para a disciplina Delineamento e Análise de Experimentos.
 
 # Introdução
 
-A pipoca é um dos alimentos mais populares no Brasil, e o mercado oferece diferentes categorias de milho, como Comum, Premium e Super Premium, que prometem maior rendimento e menor quantidade de grãos não estourados. Entretanto, a qualidade da pipoca produzida depende não apenas das características do grão, mas também das condições de preparo, especialmente do tempo de aquecimento. Nesse contexto, este estudo tem como objetivo avaliar, se as diferentes categorias de milho apresentam comportamentos distintos quando submetidas a diferentes tempos de cozimento. Busca-se, em particular, verificar se os produtos de maior valor agregado mantêm um desempenho superior independentemente do tempo de preparo ou se existe interação entre o tipo de milho e o tempo de exposição ao calor.
+A pipoca é um dos alimentos mais populares no Brasil, e o mercado oferece diferentes categorias de milho, como Comum e Premium, que prometem maior rendimento e menor quantidade de grãos não estourados. Entretanto, a qualidade da pipoca produzida depende não apenas das características do grão, mas também das condições de preparo, especialmente do tempo de aquecimento. Nesse contexto, este estudo tem como objetivo avaliar, se as diferentes categorias de milho apresentam comportamentos distintos quando submetidas a diferentes tempos de cozimento. Busca-se, em particular, verificar se os produtos de maior valor agregado mantêm um desempenho superior independentemente do tempo de preparo ou se existe interação entre o tipo de milho e o tempo de exposição ao calor.
 
 # Materiais e Métodos
 
-O experimento segue um Delineamento Inteiramente Casualizado (DIC) com estrutura fatorial $3 \times 3$.
+O experimento segue um Delineamento Inteiramente Casualizado (DIC) com estrutura fatorial $2 \times 3$, com $3$ repetições.
 
 ## Modelo escolhido e Hipóteses
 
-O modelo estatístico escolhido para as análises foi o Modelo de Efeito de Tratamentos com Dois Fatores:
+O modelo estatístico escolhido para as análises foi o Modelo de Efeito Aleatórios com Dois Fatores:
 
 $$
-Y_{ijk} = \mu + \alpha_i + \beta_j + \delta_{ij} + e_{ijk}, i = 1, ..., a; j=1, ..., b, k=1,...,n
+Y_{ijk} = \mu + A_i + B_j + (AB)_{ij} + e_{ijk}, i = 1, ..., a; j=1, ..., b, k=1,...,n
 $$
+Onde:
 
-Com $e_{ijk}$ ~ $N(0, \sigma^2)$ 
+- $Y_{ijk}$ É a resposta observada para a $k$-ésima repetição do $i$-ésimo nível do fator Tipo e $j$-ésimo nível do fator Tempo
 
 - $\mu$: a média geral.
 
-- $\alpha_i$: efeito fixo do i-ésimo nível do fator Tipo.
+- $A_i$: É o efeito aleatório do Fator Tipo. Assume-se que $A_i \sim N(0,\sigma_A^2)$.
 
-- $\beta_j$: efeito fixo do j-ésimo nível do fator Tempo.
+- $B_j$: É o efeito aleatório do fator Tempo. Assume-se que $B_j \sim N(0,\sigma_B^2)$.
 
-- $\delta_{ij}$: o feito da interação do i-ésimo nível do fator Tipo e j-ésimo nível do fator Tempo.
+- $(AB)_{ij}$: É o efeito aleatório da interação entre os dois fatores. Assume-se que $AB_{ij} \sim N(0,\sigma_{AB}^2)$.
 
-Onde:
+- $e_{ijk}$: É o erro experimental aleatório. Assume-se $e_{ijk} \sim N(0,\sigma_e^2)$.
 
-- \textbf{Fator Tipo}: é o tipo de pipoca, Comum (C), Premium (P) e Super Premium (SP)
-- \textbf{Fator Tempo}: é o tempo de cozimento, 4:00, 4:15, 4:30
-- \textbf{Unidade Experimental}: pacote individual de milho
-- \textbf{Unidade Observacional}: porção de 25g proveniente do pacote individual de milho
+As suposições do modelo são:
+
+- Normalidade e Independência: Todos os efeitos e erro são V.A.`s independentes e seguem uma distribuição normal com média zero.
+
+- Componentes de Variância: A variância de uma observação individual ($Var(Y_{ijk})$) é a soma das variâncias de todos os componentes: $\sigma_y^2 = \sigma_A^2 + \sigma_B^2 + \sigma_{AB}^2 + \sigma_e^2$.
+
+- Correlação intraclasse: As observações dentro de um mesmo nível de fator são correlacionadas porque compartilham o mesmo valor da variável aleatória correspondente.
+ 
 
 ## Hipótese de Estudo
 
-A hipótese de estudo é:
+A hipótese inicial de estudo é:
 
+$H_0:$ Ausência de Interação, $\sigma_{AB}^2 = 0$
 
-$H_0:$ Ausência de Interação
-
-$H_1:$ Existência de Interação
+$H_1:$ Existência de Interação $\sigma_{AB}^2 > 0$
 
 Ou seja: testar se há interação entre os Fatores Tipo e Tempo.
 
-## Limitações, Suposições e Perdas
+## Limitações e Perdas
 
-Este estudo caracteriza-se como um experimento sequencial. Para otimização de recursos, foram reaproveitadas observações provenientes do experimento anterior, originalmente conduzido considerando apenas o fator Tipo. Para compor o nível de 4:00 minutos do fator Tempo, foram selecionadas aleatoriamente três das cinco repetições disponíveis em cada nível do fator Tipo. As dezoito unidades experimentais restantes, correspondentes aos tempos de 4:15 e 4:30, foram incorporadas ao estudo mediante uma nova casualização da ordem de execução.
+Este estudo caracteriza-se como um experimento sequencial. Para otimização de recursos, foram reaproveitadas observações provenientes do experimento anterior, originalmente conduzido considerando apenas o fator Tipo. Para compor o nível de 4:00 minutos do fator Tempo, foram selecionadas aleatoriamente três das cinco repetições disponíveis em cada nível do fator Tipo. As doze unidades experimentais restantes, correspondentes aos tempos de 4:15 e 4:30, foram incorporadas ao estudo mediante uma nova casualização da ordem de execução.
 
 Por tratar-se de um estudo com finalidade acadêmica e baseado em um modelo simplificado, algumas fontes de variação potencialmente relevantes não foram explicitamente consideradas na modelagem. Dessa forma, as inferências realizadas pressupõem que tais fatores tenham efeito desprezível sobre a variável resposta.
 
-As principais suposições do modelo são:
+Ademais, vale ressaltar que, considerando as limitações do experimento, não houve a possibilidade de aquisição de novas unidades experimentais, sendo permitido o aproveitamento dos pacotes utilizados no experimento anterior. Dessa forma, foram utilizados os 5 pacotes disponíveis de cada tipo de pipoca (Comum e Premium), os quais foram alocados de maneira aleatória aos diferentes tratamentos definidos pelos fatores do estudo. O delineamento foi, assim, complementado com base nessas unidades experimentais, respeitando o processo de casualização. Para a análise, será considerado um modelo de efeitos aleatórios com dois fatores, assumindo-se que tanto os níveis de tipo de pipoca quanto de tempo de preparo constituem fatores aleatórios.
 
-- independência entre os erros experimentais;
-- normalidade dos erros;
-- homogeneidade das variâncias entre os tratamentos;
-- ausência de efeitos sistemáticos associados aos dias de coleta, aos experimentadores, às condições ambientais e a outras fontes de variação não controladas;
-- inexistência de tendências temporais capazes de influenciar as observações provenientes das diferentes etapas do experimento.
+Um experimento mais robusto deveria considerar 18 unidades experimentais, compostas de 18 pacotes distintos, sendo esses, 9 do tipo ou marca A, e 9 do tipo ou marca B.
 
-Consequentemente, os resultados obtidos devem ser interpretados dentro do contexto dessas simplificações e das limitações inerentes ao delineamento adotado.
 
 
 ## Casualização
 
-Os dados serão colhidos de maneira casualizada, por meio de 15 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. 
+Os dados serão colhidos de maneira casualizada, por meio de 10 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. 
 
 ## Coleta
 
-A coleta de dados foi realizada de mandeira padronizada, por 3 experimentadores, dado o roteiro:
+A coleta de dados foi realizada de mandeira padronizada, dado o roteiro:
 
 - Pesagem e medição de 25 g de milho do Fator Tipo e 6 mL de óleo de cozinha;
 
@@ -254,17 +253,17 @@ A coleta de dados foi realizada de mandeira padronizada, por 3 experimentadores,
 A proporção de não estourados/queimados foi definida como:
 
 $$
-Y_{ij} = \frac{n_{ne}}{n_t}
+Y_{ijk} = \frac{n_{ne}}{n_t}
 $$
 
-em que $n_{ne}$ corresponde ao número de grãos não estourados ou queimados e $n_t$ ao número total de grãos avaliados na unidade experimental.
+em que $n_{ne}$ é o número de grãos não estourados ou queimados na unidade experimental $ijk$ e $n_t$ é o número total de grãos avaliados naquela mesma unidade.
 
 Foram considerados estourados os grãos que apresentaram abertura completa ou parcial, desde que seja visualmente identficável o rompimento da estrutura do grão.
 Os dados coletados podem ser encontrados no apêndice, na Tabela X, e suas estatísticas descritivas na Tabela X+1
 
 ### Boxplot
 
-Inserir boxplot com 9 caixinhas de dados, cada caixinha será uma combinação de tempo x tipo
+Inserir boxplot com 12 caixinhas de dados, cada caixinha será uma combinação de tempo x tipo
 
 ## Transformação de Box-Cox
 

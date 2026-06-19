@@ -1,32 +1,26 @@
 
-set.seed(190620026)
+set.seed(123)
 
-comum <- paste("Comum", 1:5)
-premium <- paste("Premium", 1:5)
-spremium <- paste("S Premium", 1:5)
-tipos <- c(comum, premium, spremium)
-tempos <- c("4:00", "4:15", "4:30")
-pessoas <- c("Carol", "Gabriel", "Priscila")
+comum <- paste0("Comum_", 1:5)
+premium <- paste0("Premium_", 1:5)
 
-dados <- do.call(
-    rbind,
-    lapply(pessoas, function(pessoa) {
-        expand.grid(
-            Tempo = tempos,
-            Categoria = c("Comum", "Premium", "S Premium")
-        ) |>
-            transform(
-                Pessoa = pessoa,
-                Tipo = c(
-                    sample(comum, 3),
-                    sample(premium, 3),
-                    sample(spremium, 3)
-                )
-            ) |>
-            subset(select = c(Pessoa, Tempo, Tipo))
-    })
-)
+tempos <- c("04:00", "04:15", "04:30")
 
-dados
+gerar_tempo <- function(t){
+    
+    data.frame(
+        Tempo = t,
+        Tipo = rep(c("Comum", "Premium"), each = 3),
+        Pacote = c(
+            sample(comum, 3),
+            sample(premium, 3)
+        )
+    )
+}
+
+dados <- do.call(rbind, lapply(tempos, gerar_tempo))
+
+
+dados <- dados[sample(nrow(dados)), ]
 
 write.csv(x = dados, file = "casualizacao.csv")
