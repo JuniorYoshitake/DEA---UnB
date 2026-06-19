@@ -209,14 +209,9 @@ Onde:
 
 A hipótese de estudo é:
 
-$$
-\left\{
-\begin{array}{l}
-H_0:\ \delta_{ij}=0 \text{ para todo } i,j \\
-H_1:\ \delta_{ij}\neq0 \text{ para algum } i,j
-\end{array}
-\right.
-$$
+$H_0:$ Ausência de Interação
+
+$H_1:$ Existência de Interação
 
 Ou seja: testar se há interação entre os Fatores Tipo e Tempo.
 
