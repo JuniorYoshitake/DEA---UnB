@@ -209,6 +209,7 @@ Onde:
 
 A hipótese de estudo é:
 
+
 $H_0:$ Ausência de Interação
 
 $H_1:$ Existência de Interação
