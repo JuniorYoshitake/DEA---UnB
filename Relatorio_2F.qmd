@@ -254,7 +254,7 @@ Para realizar o experimento de forma correta, seria necessário considerar 18 un
 
 ## Casualização
 
-Os dados serão colhidos de maneira casualizada, por meio de 10 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. 
+Os dados serão colhidos de maneira casualizada, por meio de 10 pacotes de pipoca diferentes, sendo 5 de cada tipo, em seleção e ordem aleatórias, através de software estatístico (R), totalizando 3 repetições por combinação de níveis de fatores. A ordem da casualização pode ser encontrada na @tbl-casu no apêndice.
 
 ## Coleta
 
@@ -294,6 +294,7 @@ library(knitr)
 library(kableExtra)
 library(ggplot2)
 library(RColorBrewer)
+library(lmerTest)
 
 set.seed(21062026)
 
@@ -456,10 +457,6 @@ O modelo foi ajustado através da função \texttt{lmer()}, do pacote \texttt{lm
 #| tbl-cap: "Componentes de variância do modelo - Efeitos Aleatórios"
 #| tbl-pos: H
 
-
-library(knitr)
-library(kableExtra)
-
 tabela_re <- data.frame(
   Grupo = c("Tipo:Tempo", "Tempo", "Tipo", "Residual"),
   Variancia = c(0.00000, 0.02114, 0.00000, 0.01127),
@@ -496,74 +493,216 @@ kbl(
   column_spec(1, width = "10cm")
 ```
 
-A @tbl-var é resultante do retorno do \texttt{summary(modelo2)}, no qual observa-se que o fator Tempo é o único componente que contribui de forma efetiva para a variabilidade da resposta, apresentando variância estimada de 0.02114, além do componente residual. Por outro lado, os efeitos associados a \textbf{Tipo} e à interação \textbf{Tipo:Tempo} apresentam variância estimada igual a zero, indicando que, para esta amostra, tais fontes de variação não contribuíram de maneira detectável para a variabilidade da eficiência de não estouro, sendo o Tempo o principal fator associado às diferenças observadas
+A @tbl-var apresenta as estimativas dos componentes de variância obtidas pelo ajuste do modelo misto aleatório. Observa-se que o fator Tempo foi o único efeito aleatório com componente de variância estimado diferente de zero (($\hat{\sigma}^2_{Tempo}=0.02114$)), além do componente residual (($\hat{\sigma}^2_e=0.01127$)). Esse resultado indica que parte da variabilidade observada na proporção de grãos não estourados pode ser atribuída às diferenças entre os níveis de Tempo.
 
-Adicionalmente, o ajuste do modelo retornou o aviso \texttt{boundary (singular) fit}, indicando que o modelo encontra-se em condição de singularidade, isto é, alguns componentes de variância foram estimados na fronteira do espaço paramétrico (valores nulos). Esse resultado sugere que a estrutura de dados disponível não contém informação suficiente para suportar a decomposição completa da variabilidade em todos os efeitos aleatórios especificados, de modo que a limitação no número de níveis dos fatores e na quantidade de observações restringe a estimação estável dos componentes de variância.
+Por outro lado, os componentes de variância associados ao fator Tipo e à interação Tipo × Tempo foram estimados como nulos. Dessa forma, não foram encontradas evidências, nos dados observados, de variabilidade adicional atribuível a esses efeitos além daquela já explicada pelo fator Tempo e pelo erro experimental.
 
-O retorno da função \texttt{summary()} se encontra no apêndice. Nele podemos observar que o intercepto fixo é 0.27771. Isso indica que a proporção média de grãos não estourados na população é de 27.77%.
+Adicionalmente, o ajuste do modelo retornou o aviso \texttt{boundary (singular) fit}, indicando que o modelo apresentou singularidade. Esse resultado ocorre quando um ou mais componentes de variância são estimados na fronteira do espaço paramétrico, isto é, assumem valor igual a zero. Em geral, tal situação sugere que a quantidade de informação disponível nos dados não é suficiente para sustentar a estimação de todos os componentes de variância especificados no modelo. No presente estudo, o reduzido número de níveis dos fatores (2 níveis para Tipo e 3 níveis para Tempo) e o número limitado de observações podem ter contribuído para esse comportamento.
 
-## Teste dos efeitos Aleatórios
+O intercepto estimado foi igual a 0.27771, representando a média geral da proporção de grãos não estourados. Assim, a proporção média estimada de grãos que não estouraram foi de aproximadamente 27.77%.
 
-Por meio da comparação entre o modelo completo e o modelo reduzido (sem interação), o Teste de Razão de Verossimilhança permite testar se a variabilidade de um fator é significativa.
+## Teste dos efeitos Aleatórios do modelo
 
-- Modelo sem interação: \verb|lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo), data=dados, REML=FALSE)|
-- Modelo completo: \verb|update(modelo2, REML=FALSE)| 
-
-Obs:
-
-O Modelo ajustado é: \verb|lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo)+(1|Tipo:Tempo), data=dados, REML=TRUE)|, ou seja, o modelo2 que é utilizado acima.
+Por meio da função \texttt{rand()}, do pacote \texttt{LmerTest}, é possível realizar testes baseados em razão de verossimilhança, comparando modelos com e sem cada efeito aleatório.
 
 ```{r}
 #| label: tbl-teste
 #| echo: false
 #| message: false
 #| warning: false
-#| tbl-cap: "Teste dos efeitos Aleatórios"
+#| tbl-cap: Teste dos efeitos Aleatórios - Anova-Like
 #| tbl-pos: H
 
-tabela_anova <- data.frame(
-  Modelo = c("modelo_sem_interacao", "modelo_completo"),
-  npar = c(4, 5),
-  AIC = c(-15.363, -13.363),
-  BIC = c(-11.801, -8.911),
-  logLik = c(11.681, 11.681),
-  `-2*log(L)` = c(-23.363, -23.363),
-  Chisq = c("", 0),
-  Df = c("", 1),
-  `Pr(>Chisq)` = c("", 1),
-  check.names = FALSE
+rand(modelo2)
+
+```
+
+Logo, podemos observar três coisas, a 5% de significância:
+
+1 - Não há evidência que a interação melhora o modelo; 
+
+2 - Não há evidência que o Fator Tipo melhora o modelo;
+
+3 - Há evidência de que remover o Fator Tempo piora o modelo significativamente.
+
+Portando, o teste de razão de verossimilhança para efeitos aleatórios indicou que apenas o fator Tempo contribui significativamente para a variabilidade da resposta (p = 0.032). Os fatores Tipo e a interação Tipo × Tempo não apresentaram contribuição estatisticamente significativa, sugerindo ausência de variabilidade detectável associada a esses componentes.
+
+## Intervalo de Confiança para as Componentes de Variância
+
+Calculados por meio de bootstrap, códigos no apéndice.
+
+```{r}
+#| label: tbl-ics
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Intervalos de confiança para as Componentes de Variância (95%)"
+#| tbl-pos: H
+
+vc <- as.data.frame(VarCorr(modelo2))
+
+boot_fun <- function(fit) {
+  vc <- as.data.frame(VarCorr(fit))
+  return(vc$vcov)
+}
+
+boot_res <- bootMer(
+  modelo2,
+  FUN = boot_fun,
+  nsim = 1000,
+  type = "parametric"
 )
 
-kbl(
-  tabela_anova,
-  booktabs = TRUE,
-  align = "c"
-) %>%
-  kable_styling(
-    latex_options = c("HOLD_position", "scale_down", "striped"),
-    full_width = FALSE,
-    position = "center",
-    font_size = 10
-  )
-```
-## Intervalo de Confiança para as Variâncias (via Satterwaite)
+IC <- apply(boot_res$t, 2, quantile, probs = c(0.025, 0.975))
 
-## Coeficiente de Correlação Intraclasse
+tabela_ic <- data.frame(
+  Componente = c("Tipo", "Tempo", "Tipo:Tempo", "Residual"),
+  Variancia_REML = c(0, 0.02113972, 0, 0.01126635),
+  Inf. = c(0, 0, 0, 0.004002129),
+  Sup. = c(0.006820386, 0.07517679, 0.004685372, 0.019403556)
+)
+
+kable(tabela_ic,
+      format = "latex",
+      booktabs = TRUE,
+      digits = 6) %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+Nota-se, como na @tbl-var, que o modelo está estimando Tipo e Tipo:Tempo não contribuem para a variabilidade. Isso pode ocorrer em decorrência dos poucos níveis de Tipo, baixa replicação dentro de células, estrutura 2x3x3 pouco informativa, ou por "Boundary fit", que foi citado anteriormente também.
+
+## Coeficiente de Correlação Intraclasse e IC
+
+Calculado por meio de bootstrap, códigos no apéndice.
+
+```{r}
+#| label: tbl-iccic
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Coeficiente de correlação intraclasse (ICC) e intervalos de confiança bootstrap (95%)"
+#| tbl-pos: H
+
+vc <- as.data.frame(VarCorr(modelo2))
+
+vars <- vc$vcov
+names(vars) <- vc$grp
+
+var_total <- sum(vars)
+
+ICC <- vars / var_total
+
+prop_boot <- boot_res$t / rowSums(boot_res$t)
+
+ICC_CI <- apply(prop_boot, 2, quantile, probs = c(0.025, 0.975))
+
+tabela_icc <- data.frame(
+  Componente = c("Tipo", "Tempo", "Tipo:Tempo", "Residual"),
+  ICC = c(0.0000000, 0.6523382, 0.0000000, 0.3476618),
+  IC_2.5 = c(0.0000000, 0.0000000, 0.0000000, 0.08183746),
+  IC_97.5 = c(0.2841596, 0.9004562, 0.1851642, 1.00000000)
+)
+
+kable(tabela_icc,
+      format = "latex",
+      booktabs = TRUE,
+      digits = 4) %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+
+```
+
 
 ## Análise de pressupostos
 
+### QQ Plot
+
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: QQ Plot dos resíduos do modelo
+#| fig-width: 5
+#| fig-height: 3
+#| fig-pos: "H"
+#| label: fig-qqplot
+
+par(mar = c(4, 4, 1, 1)) 
+
 qqnorm(resid(modelo2))
 qqline(resid(modelo2))
 ```
 
+Os dados aparentam ser normalmente distribuidos.
+
+### Teste de Shapiro
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+shapiro.test(residuals(modelo2))
+```
+
+O teste retornou $p-valor = 0.9954$. Portanto não rejeitamos a hipótese nula de normalidade.
+
+### Gráfico de resíduos X valores ajustados
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: Resíduos X valores Ajustados
+#| fig-width: 5
+#| fig-height: 3.25
+#| fig-pos: "H"
+#| label: fig-res
+
+par(mar = c(4, 4, 1, 1)) 
+plot(fitted(modelo2), residuals(modelo2))
+abline(h=0)
+```
+
+O gráfico de resíduos versus valores ajustados indica dispersão aproximadamente aleatória dos resíduos em torno de zero, sem a presença de padrões sistemáticos evidentes, como tendência ou estrutura curvilínea. Observa-se, entretanto, a formação de agrupamentos verticais, o que é esperado devido à natureza discreta dos valores ajustados em um modelo com estrutura fatorial balanceada e poucos níveis.
+
+Não foram observados indícios fortes de heterocedasticidade ou violação severa das suposições de homogeneidade de variâncias.
+
 # Conclusões e Sugestões
 
-# Dificuldades
+Os resultados sugerem que a variabilidade observada na resposta é predominantemente explicada pelo fator Tempo, enquanto os fatores Tipo e a interação Tipo × Tempo não apresentaram contribuição significativa para a decomposição da variância no modelo ajustado. Logo, conclui-se que o tipo de pipoca não importa significativamente na proporção de pipocas estouradas, mas sim o tempo de preparo.
+
+Outrora, para um experimento mais robusto, é recomendado mais observações por combinação de fatores. A configuração 2x3x3 apresenta limitações que contribuem para as falhas do modelo, como a "Boundary fit".
+
 
 # Apêndice
 
-## Tabelas
+## Tabelas Adicionais
+
+```{r}
+#| label: tbl-casu
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: Ordem da Casualização
+#| tbl-pos: H
+
+dados_tab <- data.frame(
+  Tempo = c("04:15","04:00","04:15","04:15","04:15","04:30",
+            "04:30","04:30","04:00","04:00","04:15","04:30",
+            "04:00","04:30","04:30","04:00","04:15","04:00"),
+  
+  Pacote = c("Comum_2","Comum_5","Comum_1","Premium_1","Comum_3","Comum_4",
+             "Premium_5","Premium_4","Premium_2","Comum_3","Premium_2","Comum_3",
+             "Premium_5","Comum_5","Premium_1","Comum_2","Premium_3","Premium_4")
+)
+
+kable(dados_tab,
+      format = "latex",
+      booktabs = TRUE,
+      align = "c") %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
 
 ```{r}
 #| label: tbl-coleta
@@ -641,4 +780,201 @@ estatisticas %>%
     full_width = FALSE,
     position = "center"
   )
+```
+
+## Códigos
+
+### Dados
+
+```{r}
+#| eval: false 
+
+library(dplyr)
+library(car)
+library(MASS)
+library(lme4)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(RColorBrewer)
+library(lmerTest)
+
+set.seed(21062026)
+
+dados <- data.frame(
+  Tempo = c(
+    "04:00","04:00","04:00",
+    "04:00","04:00","04:00",
+    "04:15","04:15","04:15",
+    "04:15","04:15","04:15",
+    "04:30","04:30","04:30",
+    "04:30","04:30","04:30"),
+  Tipo = c(
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium"),
+  Pacote = c(
+    5,3,2,
+    2,5,4,
+    2,1,3,
+    1,2,3,
+    4,3,5,
+    5,4,1),
+  qtd_antes = c(
+    132,139,132,
+    126,122,124,
+    136,132,134,
+    132,127,147,
+    144,145,134,
+    123,127,129),
+  qtd_nao_estourou = c(
+    64,69,44,
+    73,42,57,
+    47,18,43,
+    30,34,4,
+    24,19,15,
+    7,45,20)
+)
+
+# Transformando variáveis em fatores
+dados$Tempo <- factor(dados$Tempo)
+dados$Tipo <- factor(dados$Tipo)
+dados$Pacote <- factor(dados$Pacote)
+
+# Criando a variável resposta (proporção)
+dados$prop_nao_estourou <- dados$qtd_nao_estourou / dados$qtd_antes
+```
+
+### Casualização
+
+```{r}
+#| eval: false 
+
+set.seed(123)
+
+comum <- paste0("Comum_", 1:5)
+premium <- paste0("Premium_", 1:5)
+
+tempos <- c("04:00", "04:15", "04:30")
+
+gerar_tempo <- function(t){
+    
+    data.frame(
+        Tempo = t,
+        Tipo = rep(c("Comum", "Premium"), each = 3),
+        Pacote = c(
+            sample(comum, 3),
+            sample(premium, 3)
+        )
+    )
+}
+
+dados <- do.call(rbind, lapply(tempos, gerar_tempo))
+
+
+dados <- dados[sample(nrow(dados)), ]
+```
+
+
+### Modelo escolhido
+
+```{r}
+#| eval: false 
+
+modelo2 <- lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo)+(1|Tipo:Tempo), data=dados, REML=TRUE)
+summary(modelo2)
+```
+
+### Testes dos efeitos Aleatórios do modelo
+
+```{r}
+#| eval: false 
+
+rand(modelo2)
+```
+
+### Intervalos de confiança para os Componentes da Variância
+
+```{r}
+#| eval: false 
+
+vc <- as.data.frame(VarCorr(modelo2))
+
+boot_fun <- function(fit) {
+  vc <- as.data.frame(VarCorr(fit))
+  return(vc$vcov)
+}
+
+boot_res <- bootMer(
+  modelo2,
+  FUN = boot_fun,
+  nsim = 1000,
+  type = "parametric"
+)
+
+IC <- apply(boot_res$t, 2, quantile, probs = c(0.025, 0.975))
+
+tabela_ic <- data.frame(
+  Componente = c("Tipo", "Tempo", "Tipo:Tempo", "Residual"),
+  Variancia_REML = c(0, 0.02113972, 0, 0.01126635),
+  Inf. = c(0, 0, 0, 0.004002129),
+  Sup. = c(0.006820386, 0.07517679, 0.004685372, 0.019403556)
+)
+
+kable(tabela_ic,
+      format = "latex",
+      booktabs = TRUE,
+      digits = 6) %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+### Coeficiente de correlação intraclasse (ICC) e intervalos de confiança bootstrap
+
+```{r}
+#| eval: false 
+
+vc <- as.data.frame(VarCorr(modelo2))
+
+vars <- vc$vcov
+names(vars) <- vc$grp
+
+var_total <- sum(vars)
+
+ICC <- vars / var_total
+
+prop_boot <- boot_res$t / rowSums(boot_res$t)
+
+ICC_CI <- apply(prop_boot, 2, quantile, probs = c(0.025, 0.975))
+```
+
+### QQ Plot
+
+```{r}
+#| eval: false 
+
+par(mar = c(4, 4, 1, 1)) 
+
+qqnorm(resid(modelo2))
+qqline(resid(modelo2))
+```
+
+### Teste de Shapiro
+
+```{r}
+#| eval: false 
+
+shapiro.test(residuals(modelo2))
+```
+
+### Gráfico de Resíduos
+
+```{r}
+#| eval: false 
+
+par(mar = c(4, 4, 1, 1)) 
+plot(fitted(modelo2), residuals(modelo2))
+abline(h=0)
 ```
