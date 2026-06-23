@@ -1,0 +1,215 @@
+---
+title: "Rascunho Entrega 2"
+format: html
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(car)
+library(MASS)
+library(lme4)
+
+set.seed(21062026)
+```
+
+**CASUALIZAÇÃO**
+
+\newpage
+
+**DADOS**
+
+```{r}
+#===============================
+# Banco de dados - Experimento Pipoca
+#===============================
+
+dados <- data.frame(
+  Ordem = 1:18,
+  Tempo = c(
+    "04:00","04:00","04:00",
+    "04:00","04:00","04:00",
+    "04:15","04:15","04:15",
+    "04:15","04:15","04:15",
+    "04:30","04:30","04:30",
+    "04:30","04:30","04:30"),
+  Tipo = c(
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium"),
+  Pacote = c(
+    5,3,2,
+    2,5,4,
+    2,1,3,
+    1,2,3,
+    4,3,5,
+    5,4,1),
+  qtd_antes = c(
+    132,139,132,
+    126,122,124,
+    136,132,134,
+    132,127,147,
+    144,145,134,
+    123,127,129),
+  qtd_nao_estourou = c(
+    64,69,44,
+    73,42,57,
+    47,18,43,
+    30,34,4,
+    24,19,15,
+    7,45,20)
+)
+
+# Transformando variáveis em fatores
+dados$Tempo <- factor(dados$Tempo)
+dados$Tipo <- factor(dados$Tipo)
+dados$Pacote <- factor(dados$Pacote)
+
+# Criando a variável resposta (proporção)
+dados$prop_nao_estourou <- dados$qtd_nao_estourou / dados$qtd_antes
+
+# Visualização do banco
+dados
+```
+
+```{r}
+str(dados)
+
+summary(dados)
+```
+
+**ESTATISTICA DESCRITIVA**
+
+```{r}
+estatisticas <- dados %>%
+    group_by(Tipo,Tempo) %>%
+    summarise( n=n(),
+        media=mean(prop_nao_estourou),
+        desvio=sd(prop_nao_estourou),
+        cv=100*sd(prop_nao_estourou)/mean(prop_nao_estourou),
+        min=min(prop_nao_estourou),
+        max=max(prop_nao_estourou)
+)
+
+estatisticas
+```
+
+```{r}
+aggregate(prop_nao_estourou ~ Tipo + Tempo,
+          data = dados,
+          mean)
+```
+
+**ANALISE GRAFICA**
+
+```{r}
+boxplot(prop_nao_estourou~Tipo,data=dados)
+```
+
+```{r}
+boxplot(prop_nao_estourou~Tempo,data=dados)
+```
+
+```{r}
+boxplot(prop_nao_estourou~Tipo:Tempo,data=dados)
+```
+
+```{r}
+interaction.plot(
+    dados$Tempo,
+    dados$Tipo,
+    dados$prop_nao_estourou)
+```
+
+**MODELO**
+
+$$Y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \epsilon_{ijk}$$
+
+Onde
+
+-  $Y_{ijk}$ é a proporção de grãos que não estouraram para o tipo $i$, tempo $j$ e repetição $k$.
+
+-  $\mu$ é a média geral do número de grãos que não estouraram.
+
+-  $\alpha_i$ é o efeito da tipo $i$.
+
+-  $\beta_j$ é o efeito do tempo $j$.
+
+- $(\alpha\beta)_{ij}$ é o efeito de interação entre o tipo $i$ e o tempo $j$.
+
+- $\epsilon_{ijk}$ é o erro aleatório associado à observação $ijk$, assumido como normalmente distribuído com média zero e variância constante.
+
+Assume-se que:
+
+- $\alpha_1 ∼ N(0, \sigma^{2}_{M}​)$
+
+- $\beta_1 ∼ N(0, \sigma^{2}_{T}​)$ -
+
+- $(\alpha\beta)_{11} ∼ N(0, \sigma^{2}_{MT}​)$
+
+- $\epsilon_{ijk} ∼ N(0, \sigma^{2}​)$
+
+```{r}
+modelo <- aov(prop_nao_estourou ~ Tipo*Tempo, data = dados)
+summary(modelo)
+```
+
+**VERIFICAÇÃO DE PRESSUPOSTOS**
+
+```{r}
+# Resíduos 
+residuos <- residuals(modelo)
+residuos
+```
+
+**Normalidade**
+
+Hipóteses
+
+$H_0 : \text{Os residuos seguem distribuição normal}$
+
+$H_1 : \text{Os residuos não seguem distribuição normal}$
+
+A normalidade dos resíduos pode ser avaliada por meio do teste de Shapiro-Wilk e pela análise gráfica do QQ-plot.
+
+```{r}
+shapiro.test(residuos) #Teste de Shapiro-Wilk
+```
+
+```{r, fig.width=6, fig.height=4, fig.align='center'}
+qqnorm(residuos)
+qqline(residuos)
+```
+
+**AJUSTE DO MODELO**
+
+```{r}
+modelo2 <- lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo)+(1|Tipo:Tempo), data=dados, REML=TRUE)
+summary(modelo2)
+```
+
+**COMPONENTES DE VARIÂNCIA**
+
+```{r}
+VarCorr(modelo2)
+
+as.data.frame(VarCorr(modelo2))
+```
+
+**ANOVA**
+
+```{r}
+anova(modelo2)
+```
+
+**TESTE DOS EFEITOS ALEATÓRIOS**
+
+```{r}
+modelo_sem_interacao <- lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo), data=dados, REML=FALSE)
+
+modelo_completo <- update(modelo2, REML=FALSE)
+
+anova(modelo_sem_interacao, modelo_completo)
+```
