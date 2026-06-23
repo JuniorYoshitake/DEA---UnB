@@ -12,6 +12,10 @@ lang: pt-BR
 bibliography: referencias.bib
 csl: abnt.csl
 
+language:
+  label:
+    fig: "Gráfico"
+
 format:
   pdf:
     pdf-engine: lualatex
@@ -58,6 +62,22 @@ format:
         \usepackage{subcaption}
         \usepackage{array}
         \usepackage{amsmath}
+        \usepackage{etoolbox}
+        
+        % ------------------------------------------------
+        % Pular numeração do sumário
+        
+        \AtBeginDocument{
+            \pagenumbering{gobble} % remove numeração do sumário
+          }
+
+            \let\oldtableofcontents\tableofcontents
+            \renewcommand{\tableofcontents}{
+                \oldtableofcontents
+                \clearpage
+                \pagenumbering{arabic}
+                \setcounter{page}{1}
+          }
 
         % ------------------------------------------------
         % Bibliografia ABNT
@@ -120,7 +140,9 @@ format:
         \titlespacing*{\section}{0cm}{0cm}{0.5cm}
         \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
         \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
-
+crossref:
+    fig-title: "Gráfico"
+    fig-prefix: "Gráfico"
 ---
 
 \begin{titlepage}
@@ -228,9 +250,7 @@ Por tratar-se de um estudo com finalidade acadêmica e baseado em um modelo simp
 
 Ademais, vale ressaltar que, considerando as limitações do experimento, não houve a possibilidade de aquisição de novas unidades experimentais, sendo permitido o aproveitamento dos pacotes utilizados no experimento anterior. Dessa forma, foram utilizados os 5 pacotes disponíveis de cada tipo de pipoca (Comum e Premium), os quais foram alocados de maneira aleatória aos diferentes tratamentos definidos pelos fatores do estudo. O delineamento foi, assim, complementado com base nessas unidades experimentais, respeitando o processo de casualização. Para a análise, será considerado um modelo de efeitos aleatórios com dois fatores, assumindo-se que tanto os níveis de tipo de pipoca quanto de tempo de preparo constituem fatores aleatórios.
 
-Um experimento mais robusto deveria considerar 18 unidades experimentais, compostas de 18 pacotes distintos, sendo esses, 9 do tipo ou marca A, e 9 do tipo ou marca B.
-
-
+Para realizar o experimento de forma correta, seria necessário considerar 18 unidades experimentais, compostas de 18 pacotes distintos, sendo esses, 9 do tipo ou marca A, e 9 do tipo ou marca B.
 
 ## Casualização
 
@@ -259,41 +279,366 @@ $$
 em que $n_{ne}$ é o número de grãos não estourados ou queimados na unidade experimental $ijk$ e $n_t$ é o número total de grãos avaliados naquela mesma unidade.
 
 Foram considerados estourados os grãos que apresentaram abertura completa ou parcial, desde que seja visualmente identficável o rompimento da estrutura do grão.
-Os dados coletados podem ser encontrados no apêndice, na Tabela X, e suas estatísticas descritivas na Tabela X+1
+Os dados coletados podem ser encontrados no apêndice, @tbl-coleta, e suas estatísticas descritivas na @tbl-descritivas.
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+
+library(dplyr)
+library(car)
+library(MASS)
+library(lme4)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(RColorBrewer)
+
+set.seed(21062026)
+
+dados <- data.frame(
+  Tempo = c(
+    "04:00","04:00","04:00",
+    "04:00","04:00","04:00",
+    "04:15","04:15","04:15",
+    "04:15","04:15","04:15",
+    "04:30","04:30","04:30",
+    "04:30","04:30","04:30"),
+  Tipo = c(
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium",
+    "Comum","Comum","Comum",
+    "Premium","Premium","Premium"),
+  Pacote = c(
+    5,3,2,
+    2,5,4,
+    2,1,3,
+    1,2,3,
+    4,3,5,
+    5,4,1),
+  qtd_antes = c(
+    132,139,132,
+    126,122,124,
+    136,132,134,
+    132,127,147,
+    144,145,134,
+    123,127,129),
+  qtd_nao_estourou = c(
+    64,69,44,
+    73,42,57,
+    47,18,43,
+    30,34,4,
+    24,19,15,
+    7,45,20)
+)
+
+# Transformando variáveis em fatores
+dados$Tempo <- factor(dados$Tempo)
+dados$Tipo <- factor(dados$Tipo)
+dados$Pacote <- factor(dados$Pacote)
+
+# Criando a variável resposta (proporção)
+dados$prop_nao_estourou <- dados$qtd_nao_estourou / dados$qtd_antes
+```
+
 
 ### Boxplot
 
-Inserir boxplot com 12 caixinhas de dados, cada caixinha será uma combinação de tempo x tipo
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Boxplot das combinações dos dois fatores (Tratamento)"
+#| label: fig-boxplot
+#| fig-height: 3
+#| fig-width: 6
+#| fig-pos: "H"
+#| fig-align: "center" 
 
-## Transformação de Box-Cox
 
-Dados de contagem são naturalmente discretos e frequentemente apresentam distribuição assimétrica e variância não constante, características que podem violar os pressupostos de normalidade e homocedasticidade exigidos por modelos estatísticos paramétricos. Assim, a transformação de Box-Cox pode ser empregada com objetivo de estabilizar a variância e aproximar a distribuição dos resíduos da normalidade, permitindo a realização de análises estatísticas mais adequadas.
+ggplot(
+  dados,
+  aes(
+    x = interaction(Tipo, Tempo, sep = "\n"),
+    y = prop_nao_estourou,
+    fill = Tipo
+  )
+) +
+  geom_boxplot(width = 0.7, alpha = 0.8) +
+  scale_fill_brewer(palette = "BuPu") +
+  scale_y_continuous(
+    labels = scales::label_percent(accuracy = 1)
+  ) +
+  labs(
+    x = "Tratamento",
+    y = "Proporção de pacotes não estourados",
+    fill = "Tipo"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text.x = element_text(size = 9),
+    axis.text.y = element_text(size = 9),
+    axis.title.x = element_text(margin = margin(t = 10), size = 8),
+    axis.title.y = element_text(margin = margin(r = 10), size = 8),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line.x = element_line(color = "black"),
+    axis.line.y = element_line(color = "black")
+  )
+```
 
+De forma preliminar, é possível notar que nível 04:30 do fator Tempo possui uma menor proporção de não estourados, principalmente no nível Comum do fator Tipo.
 
-O valor de $\lambda$ que maximizou a função de verossimilhança foi:
+### Gráfico de Interação
 
-$$
-\lambda = fazer
-$$
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Gráfico de Interação"
+#| label: fig-inter
+#| fig-height: 3
+#| fig-width: 6.6
+#| fig-pos: "H"
+#| fig-align: "center" 
 
-Como $|\lambda| > 0,1$, foi utilizada a seguinte transformação nos dados:
+par(mar = c(4, 4, 1, 1)) 
 
-$$
-Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
-$$
+interaction.plot(
+  x.factor = dados$Tempo,
+  trace.factor = dados$Tipo,
+  response = dados$prop_nao_estourou,
+  
+  col = c("#2B8CBE", "#756BB1"),
+  lty = 1,
+  lwd = 2,
+  pch = 19,
+  
+  xlab = "Tempo",
+  ylab = "Proporção de pacotes não estourados",
+  trace.label = "Tipo",
+  
+  ylim = range(dados$prop_nao_estourou),
+  
+  main = "",
+  cex.lab = 0.75
+)
+```
+
+Embora o @fig-inter aponte interação, é necessário lembrar que em modelos aleatórios, os objetos de análise são as variâncias, enquanto o gráfico de interação é sobre as médias. Logo, é possível que o gráfico aponte interação, mas a hipótese permanecer não rejeitada.
 
 # Resultados
 
-## Gráfico de Interação
+```{r}
+#| message: false
+#| warning: false
+#| include: false
 
-## Intervalo de Confiança para Médias
+modelo2 <- lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo)+(1|Tipo:Tempo), data=dados, REML=TRUE)
+summary(modelo2)
+```
 
-## ANOVA
 
-## Análise das suposições atendidas
+## Ajuste do Modelo
+
+O modelo foi ajustado através da função \texttt{lmer()}, do pacote \texttt{lme4}, com Máxima Verossimilhança Restrita.
+
+```{r}
+#| label: tbl-var
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Componentes de variância do modelo - Efeitos Aleatórios"
+#| tbl-pos: H
+
+
+library(knitr)
+library(kableExtra)
+
+tabela_re <- data.frame(
+  Grupo = c("Tipo:Tempo", "Tempo", "Tipo", "Residual"),
+  Variancia = c(0.00000, 0.02114, 0.00000, 0.01127),
+  Desvio_Padrao = c(0.0000, 0.1454, 0.0000, 0.1061)
+)
+
+names(tabela_re) <- c("Grupo", "Variância", "Desvio Padrão")
+
+linha_extra <- data.frame(
+  Grupo = "Estrutura do modelo: 18 observações | 6 grupos Tipo:Tempo | 3 níveis Tempo | 2 níveis Tipo",
+  Variancia = "",
+  Desvio_Padrao = ""
+)
+
+names(linha_extra) <- c("Grupo", "Variância", "Desvio Padrão")
+
+tabela_final <- rbind(tabela_re, linha_extra)
+
+kbl(
+  tabela_final,
+  booktabs = TRUE,
+  align = c("c", "c", "c")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped"),
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(
+    nrow(tabela_final),
+    bold = TRUE,
+    extra_latex_after = "\\hline"
+  ) %>%
+  column_spec(1, width = "10cm")
+```
+
+A @tbl-var é resultante do retorno do \texttt{summary(modelo2)}, no qual observa-se que o fator Tempo é o único componente que contribui de forma efetiva para a variabilidade da resposta, apresentando variância estimada de 0.02114, além do componente residual. Por outro lado, os efeitos associados a \textbf{Tipo} e à interação \textbf{Tipo:Tempo} apresentam variância estimada igual a zero, indicando que, para esta amostra, tais fontes de variação não contribuíram de maneira detectável para a variabilidade da eficiência de não estouro, sendo o Tempo o principal fator associado às diferenças observadas
+
+Adicionalmente, o ajuste do modelo retornou o aviso \texttt{boundary (singular) fit}, indicando que o modelo encontra-se em condição de singularidade, isto é, alguns componentes de variância foram estimados na fronteira do espaço paramétrico (valores nulos). Esse resultado sugere que a estrutura de dados disponível não contém informação suficiente para suportar a decomposição completa da variabilidade em todos os efeitos aleatórios especificados, de modo que a limitação no número de níveis dos fatores e na quantidade de observações restringe a estimação estável dos componentes de variância.
+
+O retorno da função \texttt{summary()} se encontra no apêndice. Nele podemos observar que o intercepto fixo é 0.27771. Isso indica que a proporção média de grãos não estourados na população é de 27.77%.
+
+## Teste dos efeitos Aleatórios
+
+Por meio da comparação entre o modelo completo e o modelo reduzido (sem interação), o Teste de Razão de Verossimilhança permite testar se a variabilidade de um fator é significativa.
+
+- Modelo sem interação: \verb|lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo), data=dados, REML=FALSE)|
+- Modelo completo: \verb|update(modelo2, REML=FALSE)| 
+
+Obs:
+
+O Modelo ajustado é: \verb|lmer(prop_nao_estourou~(1|Tipo)+(1|Tempo)+(1|Tipo:Tempo), data=dados, REML=TRUE)|, ou seja, o modelo2 que é utilizado acima.
+
+```{r}
+#| label: tbl-teste
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Teste dos efeitos Aleatórios"
+#| tbl-pos: H
+
+tabela_anova <- data.frame(
+  Modelo = c("modelo_sem_interacao", "modelo_completo"),
+  npar = c(4, 5),
+  AIC = c(-15.363, -13.363),
+  BIC = c(-11.801, -8.911),
+  logLik = c(11.681, 11.681),
+  `-2*log(L)` = c(-23.363, -23.363),
+  Chisq = c("", 0),
+  Df = c("", 1),
+  `Pr(>Chisq)` = c("", 1),
+  check.names = FALSE
+)
+
+kbl(
+  tabela_anova,
+  booktabs = TRUE,
+  align = "c"
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position", "scale_down", "striped"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 10
+  )
+```
+## Intervalo de Confiança para as Variâncias (via Satterwaite)
+
+## Coeficiente de Correlação Intraclasse
+
+## Análise de pressupostos
+
+```{r}
+qqnorm(resid(modelo2))
+qqline(resid(modelo2))
+```
 
 # Conclusões e Sugestões
 
-# Dificuldades.
+# Dificuldades
 
+# Apêndice
 
+## Tabelas
+
+```{r}
+#| label: tbl-coleta
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: Dados coletados
+#| tbl-pos: H
+
+dados %>% 
+  mutate(
+    `Proporção` = sprintf("%.2f%%", 100 * prop_nao_estourou)
+  ) %>% 
+  dplyr::select(
+    Tempo,
+    Tipo,
+    Pacote,
+    `Antes` = qtd_antes,
+    `Não estourou` = qtd_nao_estourou,
+    Proporção
+  ) %>% 
+  kbl(
+    booktabs = TRUE,
+    align = c("c", "c", "c", "r", "r", "r")
+  ) %>% 
+  kable_styling(
+    latex_options = c("HOLD_position", "striped"),
+    full_width = FALSE,
+    position = "center"
+  )
+```
+
+```{r}
+#| label: tbl-descritivas
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Estatísticas Descritivas - Proporção de não estourados"
+#| tbl-pos: H
+
+estatisticas <- dados %>%
+    group_by(Tipo,Tempo) %>%
+    summarise( n=n(),
+        media=mean(prop_nao_estourou),
+        desvio=sd(prop_nao_estourou),
+        cv=100*sd(prop_nao_estourou)/mean(prop_nao_estourou),
+        min=min(prop_nao_estourou),
+        max=max(prop_nao_estourou)
+)
+
+estatisticas %>%
+  mutate(
+    Média   = sprintf("%.2f%%", 100 * media),
+    Desvio  = sprintf("%.4f", desvio),
+    CV      = sprintf("%.2f%%", cv),
+    Mínimo  = sprintf("%.2f%%", 100 * min),
+    Máximo  = sprintf("%.2f%%", 100 * max)
+  ) %>%
+  dplyr::select(
+    Tipo,
+    Tempo,
+    `n` = n,
+    Média,
+    Desvio,
+    CV,
+    Mínimo,
+    Máximo
+  ) %>%
+  kbl(
+    booktabs = TRUE,
+    align = c("c", "c", "c", "r", "r", "r", "r", "r")
+  ) %>%
+  kable_styling(
+    latex_options = c("HOLD_position", "striped"),
+    full_width = FALSE,
+    position = "center"
+  )
+```
